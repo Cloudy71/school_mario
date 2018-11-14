@@ -37,14 +37,27 @@ public class GameObjectCollector {
 
     }
 
+    /**
+     * Returns all {@link GameObject} in scene.
+     *
+     * @return Array of {@link GameObject} in scene.
+     */
     public GameObject[] getGameObjects() {
         return gameObjects.toArray(new GameObject[gameObjects.size()]);
     }
 
+    /**
+     * Requests new ID for object from {@link IdFactory}.
+     */
     public void requestNewId() {
         idFactory.requestId();
     }
 
+    /**
+     * Returns {@link IdFactory} which contains new requested ID (if was requested else returns null).
+     *
+     * @return IdFactory or null
+     */
     public static final IdFactory getRequestedId() {
         return IdFactory.requested ? idFactory : null;
     }

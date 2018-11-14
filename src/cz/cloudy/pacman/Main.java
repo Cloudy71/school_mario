@@ -1,19 +1,25 @@
 package cz.cloudy.pacman;
 
+import cz.cloudy.pacman.core.Renderer;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+    public static Scene    scene;
+    public static Renderer renderer;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Group root = new Group();
+        scene = new Scene(root, 800, 600);
         primaryStage.setTitle("PacMan");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(scene);
         primaryStage.show();
+
+        renderer = new Renderer();
+
     }
 
 
