@@ -1,6 +1,9 @@
 package cz.cloudy.pacman.types;
 
-public class Vector2 {
+import cz.cloudy.pacman.interfaces.IMeasurable;
+
+public class Vector2
+        implements IMeasurable {
     public static final Vector2 IDENTITY       = new Vector2(0f, 0f);
     public static final Vector2 SCALE_IDENTITY = new Vector2(1f, 1f);
 
@@ -36,5 +39,24 @@ public class Vector2 {
 
     public float distance(Vector2 point) {
         return (float) Math.sqrt(1); // TODO: Finish
+    }
+
+    @Override
+    public String toString() {
+        return "Vector2[" + x + ", " + y + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Vector2) {
+            if (((Vector2) obj).x == x && ((Vector2) obj).y == y) return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) ((x + y) * (y + x));
     }
 }

@@ -13,8 +13,12 @@ public class SurfaceAccessor {
         return surface.getSnapshot();
     }
 
-    public static GraphicsContext getGraphicsContent(Surface surface) {
+    public static GraphicsContext getGraphicsContext(Surface surface) {
         return surface.getGraphicsContext();
+    }
+
+    public static void setRedrawFlag(Surface surface) {
+        surface.setRedrawFlag();
     }
 
 }

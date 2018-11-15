@@ -11,9 +11,11 @@ import javafx.scene.paint.Color;
 public class Surface {
     private Vector2 size;
     private Canvas  canvas;
+    private boolean redraw;
 
     private SnapshotParameters snapshotParameters;
     private GraphicsContext    graphicsContext;
+    private WritableImage      cachedSnapshot;
 
     public Surface(Vector2 size) {
         this.size = size;
@@ -22,6 +24,7 @@ public class Surface {
         this.snapshotParameters = new SnapshotParameters();
         this.snapshotParameters.setFill(Color.TRANSPARENT);
         this.graphicsContext = this.canvas.getGraphicsContext2D();
+        this.redraw = true;
     }
 
     public Vector2 getSize() {
@@ -36,11 +39,20 @@ public class Surface {
         return this.canvas;
     }
 
+    private WritableImage makeSnapshot() {
+        cachedSnapshot = this.canvas.snapshot(this.snapshotParameters, null);
+        return cachedSnapshot;
+    }
+
     protected WritableImage getSnapshot() {
-        return this.canvas.snapshot(this.snapshotParameters, null);
+        return !redraw && cachedSnapshot != null ? cachedSnapshot : makeSnapshot();
     }
 
     protected GraphicsContext getGraphicsContext() {
         return this.graphicsContext;
+    }
+
+    protected void setRedrawFlag() {
+        this.redraw = true;
     }
 }

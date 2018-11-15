@@ -1,8 +1,8 @@
 package cz.cloudy.pacman.core;
 
 public class IdFactory {
-    private static   int     id        = 0;
     protected static boolean requested = false;
+    private static   int     id        = 0;
 
     public int getId() {
         requested = false;
