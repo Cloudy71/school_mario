@@ -17,7 +17,7 @@ public class GameObjectFactory {
      * @param gameObject GameObject which should be added
      */
     public void addObject(GameObject gameObject) {
-
+        gameObjectCollector.addGameObject(gameObject);
     }
 
     /**
@@ -26,6 +26,6 @@ public class GameObjectFactory {
      * @param gameObject GameObject which should be disposed
      */
     public void disposeObject(GameObject gameObject) {
-
+        gameObjectCollector.removeGameObject(gameObject);
     }
 }

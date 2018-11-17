@@ -40,12 +40,10 @@ public class Render {
 
     protected static void lock() {
         locked = true;
-        System.out.println("locked");
     }
 
     protected static void unlock() {
         locked = false;
-        System.out.println("unlocked");
     }
 
     public static Render begin(boolean dirtyRender) {

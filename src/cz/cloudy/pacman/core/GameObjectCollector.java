@@ -14,7 +14,15 @@ public class GameObjectCollector {
         idFactory = new IdFactory();
     }
 
-    private        GameObjectHelper gameObjectHelper;
+    private GameObjectHelper gameObjectHelper;
+
+    protected void addGameObject(GameObject gameObject) {
+        gameObjects.add(gameObject);
+    }
+
+    protected void removeGameObject(GameObject gameObject) {
+        gameObjects.remove(gameObject);
+    }
 
     /**
      * Returns {@link IdFactory} which contains new requested ID (if was requested else returns null).

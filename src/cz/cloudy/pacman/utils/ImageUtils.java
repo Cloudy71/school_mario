@@ -13,6 +13,14 @@ import javafx.scene.image.WritableImage;
 
 
 public class ImageUtils {
+    /**
+     * Creates a new part {@link Image} from another {@link Image}.
+     *
+     * @param source   Source image
+     * @param position Destination
+     * @param size     Size
+     * @return New {@link Image}
+     */
     public static Image getImagePart(Image source, Int2 position, Int2 size) {
         Int2 key = new Int2(position.x * size.x, position.y * size.y);
 

@@ -37,6 +37,10 @@ public class Vector2
         return this;
     }
 
+    public Vector2 add(Vector2 offset) {
+        return move(offset);
+    }
+
     public float distance(Vector2 point) {
         return (float) Math.sqrt(1); // TODO: Finish
     }

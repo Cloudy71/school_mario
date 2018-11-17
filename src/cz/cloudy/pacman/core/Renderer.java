@@ -7,6 +7,8 @@ import cz.cloudy.pacman.surface.SurfaceAccessor;
 import cz.cloudy.pacman.types.Vector2;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +44,22 @@ public class Renderer {
 
         ((Group) Main.scene.getRoot()).getChildren()
                                       .add(SurfaceAccessor.getCanvas(surface));
+
+        Main.scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+
+        });
+
+        Main.scene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+
+        });
+
+        Main.scene.addEventHandler(KeyEvent.KEY_TYPED, event -> {
+
+        });
+
+        Main.scene.addEventHandler(MouseEvent.ANY, event -> {
+
+        });
 
         lastFramerateCheck = 0;
         gameHandlers = new LinkedList<>();
@@ -101,5 +119,17 @@ public class Renderer {
 
     public int getFramerate() {
         return currentFramerate;
+    }
+
+    public GameObjectCollector getGameObjectCollector() {
+        return gameObjectCollector;
+    }
+
+    public GameObjectHelper getGameObjectHelper() {
+        return gameObjectHelper;
+    }
+
+    public GameObjectFactory getGameObjectFactory() {
+        return gameObjectFactory;
     }
 }
