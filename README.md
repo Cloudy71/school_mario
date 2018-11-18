@@ -1,1 +1,1 @@
-# school_mario
+# school_pacman
