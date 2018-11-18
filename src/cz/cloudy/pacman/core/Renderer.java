@@ -1,6 +1,7 @@
 package cz.cloudy.pacman.core;
 
 import cz.cloudy.pacman.Main;
+import cz.cloudy.pacman.interfaces.GameObject;
 import cz.cloudy.pacman.interfaces.IGame;
 import cz.cloudy.pacman.surface.Surface;
 import cz.cloudy.pacman.surface.SurfaceAccessor;
@@ -76,10 +77,25 @@ public class Renderer {
                     framerate++;
                 }
 
+                Render.lock();
                 for (IGame gameHandler : gameHandlers) {
-                    Render.lock();
                     gameHandler.update();
-                    Render.unlock();
+                }
+                for (GameObject gameObject : gameObjectCollector.getGameObjects()) {
+                    gameObject.update();
+                }
+                Render.unlock();
+
+                for (IGame gameHandler : gameHandlers) {
+                    gameHandler.belowRender();
+                }
+
+                // TODO: Object rendering.
+                for (GameObject gameObject : gameObjectCollector.getGameObjects()) {
+                    gameObject.render();
+                }
+
+                for (IGame gameHandler : gameHandlers) {
                     gameHandler.render();
                 }
             }

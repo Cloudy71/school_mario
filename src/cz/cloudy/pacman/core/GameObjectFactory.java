@@ -18,6 +18,7 @@ public class GameObjectFactory {
      */
     public void addObject(GameObject gameObject) {
         gameObjectCollector.addGameObject(gameObject);
+        gameObject.create();
     }
 
     /**

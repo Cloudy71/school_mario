@@ -14,6 +14,4 @@ public interface IGame {
     default void belowRender() {}
 
     void render();
-
-    default void aboveRender() {}
 }
