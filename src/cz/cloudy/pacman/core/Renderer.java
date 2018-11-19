@@ -29,6 +29,7 @@ public class Renderer {
     private int  currentFramerate;
     private int  framerate;
     private long lastFramerateCheck;
+    private long lastFixedTime;
 
     /**
      * Will create new {@link Surface}.
@@ -78,12 +79,16 @@ public class Renderer {
                 }
 
                 Render.lock();
+                boolean fixedUpdate = now >= lastFixedTime + 1_000_000_000 / 60;
                 for (IGame gameHandler : gameHandlers) {
                     gameHandler.update();
+                    if (fixedUpdate) gameHandler.fixedUpdate();
                 }
                 for (GameObject gameObject : gameObjectCollector.getGameObjects()) {
                     gameObject.update();
+                    if (fixedUpdate) gameObject.fixedUpdate();
                 }
+                if (fixedUpdate) lastFixedTime = now;
                 Render.unlock();
 
                 for (IGame gameHandler : gameHandlers) {

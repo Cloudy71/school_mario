@@ -11,6 +11,8 @@ public interface IGame {
 
     void update();
 
+    default void fixedUpdate() {}
+
     default void belowRender() {}
 
     void render();

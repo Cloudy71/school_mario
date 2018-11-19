@@ -45,6 +45,10 @@ public class Vector2
         return (float) Math.sqrt(1); // TODO: Finish
     }
 
+    public Vector2 copy() {
+        return new Vector2(this.x, this.y);
+    }
+
     @Override
     public String toString() {
         return "Vector2[" + x + ", " + y + "]";

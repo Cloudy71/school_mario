@@ -36,6 +36,35 @@ public class Main
 
         Surface subSurface = new Surface(new Vector2(128, 128));
 
+        /*GameObject test = new GameObject() {
+            @Override
+            public void create() {
+
+            }
+
+            @Override
+            public void update() {
+
+            }
+
+            @Override
+            public void fixedUpdate() {
+
+            }
+
+            @Override
+            public void dispose() {
+
+            }
+
+            @Override
+            public void render() {
+
+            }
+        };
+
+        test.setSprite(tileset.getPart(new Int2(0, 22)));*/
+
         Renderer.instance.addGameHandler(new IGame() {
             @Override
             public void start() {
@@ -72,6 +101,9 @@ public class Main
                       .setTexture(tileset.getPart(new Int2(1, 21)))
                       .setPosition(new Vector2(256f, 256f))
                       .setSize(new Vector2(2f, 2f))
+                      .end()
+                      .transform()
+                      .position(new Vector2(16f, 16f))
                       .end()
                       .surface()
                       .setSurface(subSurface)

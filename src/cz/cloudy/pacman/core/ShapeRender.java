@@ -6,20 +6,22 @@
 
 package cz.cloudy.pacman.core;
 
+import cz.cloudy.pacman.interfaces.IRenderInstance;
 import cz.cloudy.pacman.types.Vector2;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
 
-public abstract class ShapeRender<T extends ShapeRender> {
+public abstract class ShapeRender<T extends ShapeRender>
+        implements IRenderInstance {
     protected Vector2 position;
     protected Vector2 size;
     protected Paint   paint;
 
     protected ShapeRender() {
-        this.paint = Render.begin(true)
-                           .getColor();
-        this.position = Vector2.IDENTITY;
-        this.size = Vector2.IDENTITY;
+        Render basic = Render.begin(true);
+        this.paint = basic.getColor();
+        this.position = Vector2.IDENTITY.copy();
+        this.size = Vector2.IDENTITY.copy();
     }
 
     public T setPosition(Vector2 position) {

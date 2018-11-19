@@ -7,7 +7,7 @@
 package cz.cloudy.pacman.io;
 
 public class CodeAccessProtector {
-    private static boolean ENABLED = true; // Might be performance demanding (Went from 760 fps to 430 fps).
+    private static boolean ENABLED = false; // Might be performance demanding (Went from 760 fps to 430 fps).
     // TODO: May replace protector with multi-package accessors which will extend main accessors in another package.
 
     public static boolean isAccessedFromClass(Class<?>... clazz) {

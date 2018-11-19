@@ -17,7 +17,7 @@ public class TextureRender
 
     protected TextureRender() {
         super();
-        this.size = Vector2.SCALE_IDENTITY;
+        this.size = Vector2.SCALE_IDENTITY.copy();
     }
 
     public TextureRender setTexture(Image image) {

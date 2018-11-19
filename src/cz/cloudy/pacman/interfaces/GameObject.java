@@ -1,6 +1,7 @@
 package cz.cloudy.pacman.interfaces;
 
 import cz.cloudy.pacman.core.GameObjectCollector;
+import cz.cloudy.pacman.core.Render;
 import cz.cloudy.pacman.core.Renderer;
 import cz.cloudy.pacman.types.Vector2;
 import javafx.scene.image.Image;
@@ -102,10 +103,23 @@ public abstract class GameObject
     public abstract void update();
 
     /**
+     * Is invoked in fixed delta time. It means that it's invoked 60 times every second as to keep 60 frames per second.
+     */
+    public abstract void fixedUpdate();
+
+    /**
      * Is invoked when destroy is executed on actual GameObject.
      */
     public abstract void dispose();
 
+    @Override
+    public void render() {
+        Render.begin()
+              .tex()
+              .setTexture(sprite)
+              .end()
+              .finish();
+    }
 
     /**
      * Invokes destroy process.
