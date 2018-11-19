@@ -18,6 +18,7 @@ public class SurfaceAccessor {
         if (!CodeAccessProtector.isAccessedFromPackage("cz.cloudy.")) {
             return null;
         }
+
         return surface.getSnapshot();
     }
 
@@ -25,6 +26,7 @@ public class SurfaceAccessor {
         if (!CodeAccessProtector.isAccessedFromPackage("cz.cloudy.")) {
             return null;
         }
+
         return surface.getGraphicsContext();
     }
 
@@ -32,6 +34,7 @@ public class SurfaceAccessor {
         if (!CodeAccessProtector.isAccessedFromPackage("cz.cloudy.")) {
             return;
         }
+
         surface.setRedrawFlag();
     }
 
