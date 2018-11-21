@@ -6,7 +6,6 @@
 
 package cz.cloudy.pacman.core;
 
-import cz.cloudy.pacman.interfaces.IRenderInstance;
 import cz.cloudy.pacman.types.Vector2;
 
 public class TransformInstance
@@ -42,5 +41,12 @@ public class TransformInstance
     public Render end() {
         return Render.begin(true)
                      .addToQueue(this);
+    }
+
+    @Override
+    public void proceed() {
+        Render basic = Render.begin(true);
+        basic.transformPosition = position;
+        basic.transformSize = size;
     }
 }

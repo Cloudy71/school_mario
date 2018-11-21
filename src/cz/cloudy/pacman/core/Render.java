@@ -6,7 +6,6 @@
 
 package cz.cloudy.pacman.core;
 
-import cz.cloudy.pacman.interfaces.IRenderInstance;
 import cz.cloudy.pacman.surface.SurfaceAccessor;
 import cz.cloudy.pacman.types.Vector2;
 import javafx.geometry.VPos;
@@ -23,12 +22,15 @@ import java.util.List;
 public class Render {
     private static Render instance;
 
-    private Paint                 paint;
-    private Font                  font;
-    private List<IRenderInstance> queue;
+    protected Paint                 paint;
+    protected Font                  font;
+    protected List<IRenderInstance> queue;
 
-    private Vector2 transformPosition;
-    private Vector2 transformSize;
+    protected Vector2 transformPosition;
+    protected Vector2 transformSize;
+
+    protected Paint currentPaint;
+    protected Font  currentFont;
 
     private static boolean locked;
 
@@ -63,7 +65,15 @@ public class Render {
     protected static Render getCleanRender() {
         instance.queue.clear();
         instance.resetTransform();
+        instance.paint = Color.BLACK;
+        instance.font = Font.getDefault();
+        instance.setCurrents();
         return instance;
+    }
+
+    private void setCurrents() {
+        this.currentPaint = this.paint;
+        this.currentFont = this.font;
     }
 
     protected static GraphicsContext getContext() {
@@ -95,21 +105,19 @@ public class Render {
     }
 
     public Paint getColor() {
-        return this.paint;
+        return this.currentPaint;
     }
 
-    public Font getFont() {return this.font;}
-
-    public Render color(Paint paint) {
-        this.paint = paint;
-
-        return this;
+    public Font getFont() {
+        return this.currentFont;
     }
 
-    public Render font(Font font) {
-        this.font = font;
+    public PaintInstance color() {
+        return new PaintInstance();
+    }
 
-        return this;
+    public FontInstance font() {
+        return new FontInstance();
     }
 
     public Render clear(boolean solid) {
@@ -126,13 +134,21 @@ public class Render {
         return new RectangleRender();
     }
 
-    public TextureRender tex() {return new TextureRender();}
+    public TextureRender tex() {
+        return new TextureRender();
+    }
 
-    public SurfaceRender surface() {return new SurfaceRender();}
+    public SurfaceRender surface() {
+        return new SurfaceRender();
+    }
 
-    public TextRender text() {return new TextRender();}
+    public TextRender text() {
+        return new TextRender();
+    }
 
-    public TransformInstance transform() {return new TransformInstance();}
+    public TransformInstance transform() {
+        return new TransformInstance();
+    }
 
     public void finish() {
         for (IRenderInstance renderInstance : queue) {
@@ -141,10 +157,9 @@ public class Render {
                 shapeRender.position.add(this.transformPosition);
                 shapeRender.size.add(this.transformSize);
                 shapeRender.draw(Render.getContext());
-            } else if (renderInstance instanceof TransformInstance) {
-                TransformInstance transformInstance = (TransformInstance) renderInstance;
-                this.transformPosition = transformInstance.position;
-                this.transformSize = transformInstance.size;
+            }
+            else {
+                renderInstance.proceed();
             }
         }
         queue.clear();

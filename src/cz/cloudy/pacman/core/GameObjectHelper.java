@@ -1,7 +1,5 @@
 package cz.cloudy.pacman.core;
 
-import cz.cloudy.pacman.interfaces.GameObject;
-
 public class GameObjectHelper {
     private GameObjectCollector gameObjectCollector;
 

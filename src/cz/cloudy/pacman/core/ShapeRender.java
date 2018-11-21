@@ -6,7 +6,6 @@
 
 package cz.cloudy.pacman.core;
 
-import cz.cloudy.pacman.interfaces.IRenderInstance;
 import cz.cloudy.pacman.types.Vector2;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
@@ -40,9 +39,4 @@ public abstract class ShapeRender<T extends ShapeRender>
     }
 
     protected abstract void draw(GraphicsContext gc);
-
-    public Render end() {
-        return Render.begin(true)
-                     .addToQueue(this);
-    }
 }

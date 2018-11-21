@@ -1,7 +1,5 @@
 package cz.cloudy.pacman.core;
 
-import cz.cloudy.pacman.interfaces.GameObject;
-
 import java.util.LinkedList;
 import java.util.List;
 

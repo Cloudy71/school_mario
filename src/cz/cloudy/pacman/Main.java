@@ -2,6 +2,7 @@ package cz.cloudy.pacman;
 
 import cz.cloudy.pacman.core.Render;
 import cz.cloudy.pacman.core.Renderer;
+import cz.cloudy.pacman.core.GameObject;
 import cz.cloudy.pacman.interfaces.IGame;
 import cz.cloudy.pacman.surface.Surface;
 import cz.cloudy.pacman.types.Int2;
@@ -36,34 +37,8 @@ public class Main
 
         Surface subSurface = new Surface(new Vector2(128, 128));
 
-        /*GameObject test = new GameObject() {
-            @Override
-            public void create() {
 
-            }
-
-            @Override
-            public void update() {
-
-            }
-
-            @Override
-            public void fixedUpdate() {
-
-            }
-
-            @Override
-            public void dispose() {
-
-            }
-
-            @Override
-            public void render() {
-
-            }
-        };
-
-        test.setSprite(tileset.getPart(new Int2(0, 22)));*/
+        //test.setSprite(tileset.getPart(new Int2(0, 22)));
 
         Renderer.instance.addGameHandler(new IGame() {
             @Override
@@ -79,7 +54,9 @@ public class Main
             public void render() {
                 subSurface.setTarget();
                 Render.begin()
-                      .color(Color.RED)
+                      .color()
+                      .paint(Color.RED)
+                      .end()
                       .clear(true)
                       .text()
                       .setText("FPS: " + renderer.getFramerate())
@@ -90,7 +67,9 @@ public class Main
                 Renderer.instance.resetRenderTarget();
 
                 Render.begin()
-                      .color(Color.BLACK)
+                      .color()
+                      .paint(Color.BLACK)
+                      .end()
                       .clear(true)
                       .tex()
                       .setTexture(ImageUtils.getImagePart(tileset.getSource(), new Int2(0, 0), new Int2(224, 256)))
