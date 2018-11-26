@@ -1,14 +1,15 @@
 package cz.cloudy.pacman;
 
-import cz.cloudy.pacman.core.Render;
-import cz.cloudy.pacman.core.Renderer;
-import cz.cloudy.pacman.core.GameObject;
-import cz.cloudy.pacman.interfaces.IGame;
-import cz.cloudy.pacman.surface.Surface;
-import cz.cloudy.pacman.types.Int2;
-import cz.cloudy.pacman.types.Tileset;
-import cz.cloudy.pacman.types.Vector2;
-import cz.cloudy.pacman.utils.ImageUtils;
+import cz.cloudy.fxengine.core.GameObjectFactory;
+import cz.cloudy.fxengine.core.Render;
+import cz.cloudy.fxengine.core.Renderer;
+import cz.cloudy.fxengine.interfaces.IGame;
+import cz.cloudy.fxengine.surface.Surface;
+import cz.cloudy.fxengine.types.Int2;
+import cz.cloudy.fxengine.types.Tileset;
+import cz.cloudy.fxengine.types.Vector2;
+import cz.cloudy.fxengine.utils.ImageUtils;
+import cz.cloudy.pacman.objects.PacMan;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -37,6 +38,9 @@ public class Main
 
         Surface subSurface = new Surface(new Vector2(128, 128));
 
+        PacMan pacMan = GameObjectFactory.createObject(PacMan.class);
+        pacMan.setSprite(tileset.getPart(new Int2(1, 21)));
+        pacMan.setPosition(new Vector2(320f, 320f));
 
         //test.setSprite(tileset.getPart(new Int2(0, 22)));
 
@@ -63,6 +67,11 @@ public class Main
                       .setPaint(Color.WHITE)
                       .setPosition(new Vector2(0f, 0f))
                       .end()
+                      .text()
+                      .setText("FFPS: " + renderer.getFixedFramerate())
+                      .setPaint(Color.WHITE)
+                      .setPosition(new Vector2(0f, 32f))
+                      .end()
                       .finish();
                 Renderer.instance.resetRenderTarget();
 
@@ -86,6 +95,7 @@ public class Main
                       .end()
                       .surface()
                       .setSurface(subSurface)
+                      .setPosition(Vector2.IDENTITY())
                       .end()
                       .finish();
             }
