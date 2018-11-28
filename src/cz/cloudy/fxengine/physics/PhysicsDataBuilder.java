@@ -29,7 +29,7 @@ public class PhysicsDataBuilder {
     }
 
     public static PhysicsData buildRectangle(Vector2 size) {
-        return new PhysicsData(false, new HitBox[] {new HitBox(null, new Vector2[] {new Vector2(0f, 0f),
+        return new PhysicsData(new HitBox[] {new HitBox(null, new Vector2[] {new Vector2(0f, 0f),
                                                                                     new Vector2(0f, size.y),
                                                                                     new Vector2(size.x, size.y),
                                                                                     new Vector2(size.x, 0f)}, false)});

@@ -2,14 +2,18 @@ package cz.cloudy.fxengine.core;
 
 import cz.cloudy.fxengine.interfaces.IGame;
 import cz.cloudy.fxengine.io.KeyboardController;
+import cz.cloudy.fxengine.physics.HitBox;
+import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.surface.Surface;
 import cz.cloudy.fxengine.surface.SurfaceAccessor;
 import cz.cloudy.fxengine.types.Vector2;
 import cz.cloudy.pacman.Main;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +38,7 @@ public class Renderer {
     private int     currentFixedFramerate;
     private int     fixedFramerate;
     private long    lastFramerateFixedCheck;
+    private boolean debugMode;
 
     /**
      * Will create new {@link Surface}.
@@ -47,6 +52,8 @@ public class Renderer {
         instance = this;
         surface = new Surface(new Vector2(Main.scene.getWidth(), Main.scene.getHeight()));
         surface.setTarget();
+
+        debugMode = true;
 
         ((Group) Main.scene.getRoot()).getChildren()
                                       .add(SurfaceAccessor.getCanvas(surface));
@@ -70,6 +77,8 @@ public class Renderer {
 
         });
 
+        GraphicsContext gc = SurfaceAccessor.getGraphicsContext(surface);
+
         lastFramerateCheck = 0;
         gameHandlers = new LinkedList<>();
         this.animationTimer = new AnimationTimer() {
@@ -82,7 +91,8 @@ public class Renderer {
                     currentFramerate = framerate;
                     framerate = 0;
                     lastFramerateCheck = now;
-                } else {
+                }
+                else {
                     framerate++;
                 }
 
@@ -99,14 +109,16 @@ public class Renderer {
                 if (fixedSection) {
 //                    lastFixedTime = now - (now - (lastFixedTime + 1_000_000_000 / 60));
 //                    lastFixedTime = now;
-                    lastFixedTime = lastFixedTime + (1_000_000_000 / 60); // TODO: Better FixedUpdate calculations (moving around 58 ~ 62 fps).
+                    lastFixedTime = lastFixedTime + (1_000_000_000 /
+                                                     60); // TODO: Better FixedUpdate calculations (moving around 58 ~ 62 fps).
                     KeyboardController.synchronizeKeys();
 
                     if (now >= lastFramerateFixedCheck + 1_000_000_000) {
                         currentFixedFramerate = fixedFramerate;
                         fixedFramerate = 0;
                         lastFramerateFixedCheck = now;
-                    } else {
+                    }
+                    else {
                         fixedFramerate++;
                     }
                 }
@@ -124,6 +136,28 @@ public class Renderer {
 
                 for (IGame gameHandler : gameHandlers) {
                     gameHandler.aboveRender();
+                }
+
+                if (debugMode) { // Render physics data
+                    gc.setStroke(Color.LIME);
+                    for (GameObject gameObject : gameObjectCollector.getGameObjects()) {
+                        PhysicsData physicsData = gameObject.getPhysicsData();
+                        if (physicsData == null)
+                            continue;
+
+                        for (HitBox hitBox : physicsData.getHitBoxes()) {
+                            Vector2[] bounds = hitBox.getBounds();
+                            double[] xPoints = new double[5];
+                            double[] yPoints = new double[5];
+                            for (int i = 0; i < bounds.length; i++) {
+                                xPoints[i] = gameObject.getAbsolutePosition().x + bounds[i].x;
+                                yPoints[i] = gameObject.getAbsolutePosition().y + bounds[i].y;
+                            }
+                            xPoints[4] = gameObject.getAbsolutePosition().x + bounds[0].x;
+                            yPoints[4] = gameObject.getAbsolutePosition().y + bounds[0].y;
+                            gc.strokePolyline(xPoints, yPoints, 5);
+                        }
+                    }
                 }
             }
         };
@@ -170,6 +204,10 @@ public class Renderer {
 
     public int getFixedFramerate() {
         return currentFixedFramerate;
+    }
+
+    public boolean isDebugMode() {
+        return this.debugMode;
     }
 
     public GameObjectCollector getGameObjectCollector() {

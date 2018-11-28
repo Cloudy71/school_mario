@@ -8,6 +8,8 @@ package cz.cloudy.fxengine.physics;
 
 import cz.cloudy.fxengine.types.Vector2;
 
+import java.util.Arrays;
+
 public class HitBox {
     protected String    name;
     protected Vector2[] polygons;
@@ -36,5 +38,9 @@ public class HitBox {
 
     public String getName() {
         return this.name;
+    }
+
+    public Vector2[] getBounds() {
+        return Arrays.copyOf(this.polygons, this.polygons.length);
     }
 }

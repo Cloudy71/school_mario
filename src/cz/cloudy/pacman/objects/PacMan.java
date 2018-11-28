@@ -8,6 +8,8 @@ package cz.cloudy.pacman.objects;
 
 import cz.cloudy.fxengine.core.GameObject;
 import cz.cloudy.fxengine.io.Keyboard;
+import cz.cloudy.fxengine.physics.PhysicsData;
+import cz.cloudy.fxengine.physics.PhysicsDataBuilder;
 import cz.cloudy.fxengine.types.Pivot;
 import cz.cloudy.fxengine.types.Vector2;
 import javafx.scene.input.KeyCode;
@@ -19,6 +21,10 @@ public class PacMan
     public void create() {
         setScale(new Vector2(2f, 2f));
         setPivot(Pivot.CENTER());
+        PhysicsData physicsData = PhysicsDataBuilder.buildRectangle(new Vector2(32f, 32f));
+        physicsData.setSolid(true);
+        physicsData.setScalable(false);
+        setPhysicsData(physicsData);
     }
 
     @Override
@@ -33,7 +39,7 @@ public class PacMan
     @Override
     public void fixedUpdate() {
         if (Keyboard.isKeyPress(KeyCode.UP)) {
-            this.move(new Vector2(0f, -1f));
+            this.move(new Vector2(0f, -2f));
         }
     }
 }

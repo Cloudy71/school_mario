@@ -107,6 +107,11 @@ public abstract class GameObject
         this.physicsData = physicsData;
     }
 
+    public Vector2 getAbsolutePosition() {
+        return new Vector2(position.x - pivot.x() * (sprite != null ? sprite.getWidth() : 0f),
+                           position.y - pivot.y() * (sprite != null ? sprite.getHeight() : 0f));
+    }
+
     public GameObject move(Vector2 offset) {
         this.position.add(offset);
         return this;

@@ -27,7 +27,8 @@ public class TextureRender
 
     @Override
     protected void draw(GraphicsContext gc) {
-        gc.drawImage(texture, position.x - size.x * pivot.x(), position.y - size.y * pivot.y(),
+        gc.drawImage(texture, position.x - texture.getWidth() * pivot.x(),
+                     position.y - texture.getHeight() * pivot.y(),
                      size.x * texture.getWidth(), size.y * texture.getHeight());
     }
 }
