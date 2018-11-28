@@ -1,20 +1,22 @@
 package cz.cloudy.fxengine.core;
 
 import cz.cloudy.fxengine.interfaces.IRenderable;
+import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.types.Pivot;
 import cz.cloudy.fxengine.types.Vector2;
 import javafx.scene.image.Image;
 
 public abstract class GameObject
         implements IRenderable {
-    private int     id;
-    private String  name;
-    private Vector2 position;
-    private float   rotation;
-    private Vector2 scale;
-    private Image   sprite;
-    private int     depth;
-    private Pivot   pivot;
+    private int         id;
+    private String      name;
+    private Vector2     position;
+    private float       rotation;
+    private Vector2     scale;
+    private Image       sprite;
+    private int         depth;
+    private Pivot       pivot;
+    private PhysicsData physicsData;
 
     /**
      * Generates GameObject without specifying name.
@@ -42,6 +44,7 @@ public abstract class GameObject
         this.sprite = null;
         this.depth = 0;
         this.pivot = Pivot.TOP_LEFT();
+        this.physicsData = null;
     }
 
     public String getName() {
@@ -94,6 +97,14 @@ public abstract class GameObject
 
     public void setPivot(Pivot pivot) {
         this.pivot = pivot;
+    }
+
+    public PhysicsData getPhysicsData() {
+        return physicsData;
+    }
+
+    public void setPhysicsData(PhysicsData physicsData) {
+        this.physicsData = physicsData;
     }
 
     public GameObject move(Vector2 offset) {
