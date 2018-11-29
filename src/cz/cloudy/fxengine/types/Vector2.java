@@ -50,6 +50,10 @@ public class Vector2
         return new Vector2(this.x, this.y);
     }
 
+    public float length() {
+        return (float) Math.sqrt(Math.pow(x, 2.0) + Math.pow(y, 2.0));
+    }
+
     @Override
     public String toString() {
         return "Vector2[" + x + ", " + y + "]";

@@ -2,7 +2,7 @@ package cz.cloudy.fxengine.core;
 
 import cz.cloudy.fxengine.interfaces.IGame;
 import cz.cloudy.fxengine.io.KeyboardController;
-import cz.cloudy.fxengine.physics.HitBox;
+import cz.cloudy.fxengine.physics.HitPoint;
 import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.surface.Surface;
 import cz.cloudy.fxengine.surface.SurfaceAccessor;
@@ -91,8 +91,7 @@ public class Renderer {
                     currentFramerate = framerate;
                     framerate = 0;
                     lastFramerateCheck = now;
-                }
-                else {
+                } else {
                     framerate++;
                 }
 
@@ -117,8 +116,7 @@ public class Renderer {
                         currentFixedFramerate = fixedFramerate;
                         fixedFramerate = 0;
                         lastFramerateFixedCheck = now;
-                    }
-                    else {
+                    } else {
                         fixedFramerate++;
                     }
                 }
@@ -142,20 +140,19 @@ public class Renderer {
                     gc.setStroke(Color.LIME);
                     for (GameObject gameObject : gameObjectCollector.getGameObjects()) {
                         PhysicsData physicsData = gameObject.getPhysicsData();
-                        if (physicsData == null)
-                            continue;
+                        if (physicsData == null) continue;
 
-                        for (HitBox hitBox : physicsData.getHitBoxes()) {
-                            Vector2[] bounds = hitBox.getBounds();
-                            double[] xPoints = new double[5];
-                            double[] yPoints = new double[5];
+                        for (HitPoint hitPoint : physicsData.getHitBoxes()) {
+                            Vector2[] bounds = hitPoint.getPolygons();
+                            double[] xPoints = new double[4];
+                            double[] yPoints = new double[4];
                             for (int i = 0; i < bounds.length; i++) {
                                 xPoints[i] = gameObject.getAbsolutePosition().x + bounds[i].x;
                                 yPoints[i] = gameObject.getAbsolutePosition().y + bounds[i].y;
                             }
-                            xPoints[4] = gameObject.getAbsolutePosition().x + bounds[0].x;
-                            yPoints[4] = gameObject.getAbsolutePosition().y + bounds[0].y;
-                            gc.strokePolyline(xPoints, yPoints, 5);
+                            xPoints[3] = gameObject.getAbsolutePosition().x + bounds[0].x;
+                            yPoints[3] = gameObject.getAbsolutePosition().y + bounds[0].y;
+                            gc.strokePolyline(xPoints, yPoints, 4);
                         }
                     }
                 }

@@ -11,22 +11,12 @@ import cz.cloudy.fxengine.types.Vector2;
 import java.util.Arrays;
 
 public class PhysicsData {
-    private boolean  solid;
-    private boolean  scalable;
-    private HitBox[] hitBoxes;
+    private boolean    scalable;
+    private HitPoint[] hitPoints;
 
-    protected PhysicsData(HitBox[] hitBoxes) {
-        this.solid = true;
+    protected PhysicsData(HitPoint[] hitPoints) {
         this.scalable = true;
-        this.hitBoxes = hitBoxes;
-    }
-
-    public void setSolid(boolean solid) {
-        this.solid = solid;
-    }
-
-    public boolean isSolid() {
-        return this.solid;
+        this.hitPoints = hitPoints;
     }
 
     public void setScalable(boolean scalable) {
@@ -37,21 +27,29 @@ public class PhysicsData {
         return this.scalable;
     }
 
-    public HitBox isHit(Vector2 position) {
-        for (HitBox hitBox : hitBoxes) {
-            if (hitBox.isHit(position)) return hitBox;
+    public HitPoint isTrigger(Vector2 position) {
+        for (HitPoint hitPoint : hitPoints) {
+            if (hitPoint.isTrigger() && hitPoint.isHit(position)) return hitPoint;
         }
         return null;
     }
 
-    public boolean isHitOnly(Vector2 position) {
-        for (HitBox hitBox : hitBoxes) {
-            if (hitBox.isHit(position)) return true;
+    public HitPoint isHit(Vector2 position) {
+        for (HitPoint hitPoint : hitPoints) {
+            if (hitPoint.isSolid() && hitPoint.isHit(position)) return hitPoint;
         }
-        return false;
+        return null;
     }
 
-    public HitBox[] getHitBoxes() {
-        return Arrays.copyOf(this.hitBoxes, this.hitBoxes.length);
+    public boolean isTriggerOnly(Vector2 position) {
+        return isTrigger(position) != null;
+    }
+
+    public boolean isHitOnly(Vector2 position) {
+        return isHit(position) != null;
+    }
+
+    public HitPoint[] getHitBoxes() {
+        return Arrays.copyOf(this.hitPoints, this.hitPoints.length);
     }
 }
