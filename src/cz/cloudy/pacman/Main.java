@@ -4,11 +4,12 @@ import cz.cloudy.fxengine.core.GameObjectFactory;
 import cz.cloudy.fxengine.core.Render;
 import cz.cloudy.fxengine.core.Renderer;
 import cz.cloudy.fxengine.interfaces.IGame;
+import cz.cloudy.fxengine.io.Mouse;
 import cz.cloudy.fxengine.surface.Surface;
 import cz.cloudy.fxengine.types.Int2;
 import cz.cloudy.fxengine.types.Tileset;
 import cz.cloudy.fxengine.types.Vector2;
-import cz.cloudy.fxengine.utils.ImageUtils;
+import cz.cloudy.fxengine.utils.GridUtils;
 import cz.cloudy.pacman.objects.PacMan;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -23,6 +24,10 @@ public class Main
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public <T extends Double> void addToList(T a) {
+
     }
 
     @Override
@@ -80,17 +85,20 @@ public class Main
                       .paint(Color.BLACK)
                       .end()
                       .clear(true)
-                      .tex()
-                      .setTexture(ImageUtils.getImagePart(tileset.getSource(), new Int2(0, 0), new Int2(224, 256)))
-                      .setPosition(new Vector2(400f - 224f, 300f - 256f))
-                      .setSize(new Vector2(2f, 2f))
-                      .end()
                       .transform()
                       .position(new Vector2(16f, 16f))
                       .end()
                       .surface()
                       .setSurface(subSurface)
                       .setPosition(Vector2.IDENTITY())
+                      .end()
+                      .transform()
+                      .reset()
+                      .end()
+                      .rect()
+                      .setPosition(GridUtils.snapToGrid(Mouse.getPosition(), new Vector2(16f, 16f), new Vector2(-8f, 4f)))
+                      .setSize(new Vector2(32f, 32f))
+                      .setPaint(Color.RED)
                       .end()
                       .finish();
             }

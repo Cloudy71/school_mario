@@ -44,6 +44,18 @@ public class GameObjectCollector {
         return gameObjects.toArray(new GameObject[gameObjects.size()]);
     }
 
+    public <T extends GameObject> T[] getGameObjectsOfType(Class<T> type) {
+        List<T> objects = new LinkedList<>();
+        for (GameObject gameObject : getGameObjects()) {
+            if (gameObject.getClass()
+                          .equals(type)) {
+                objects.add((T) gameObject);
+            }
+        }
+
+        return (T[]) objects.toArray();
+    }
+
     /**
      * Requests new ID for object from {@link IdFactory}.
      */

@@ -14,13 +14,16 @@ public class PhysicsDataBuilder {
         BOUNDS, EDGE
     }
 
+    /**
+     * Builds @{@link PhysicsData} from provided image.
+     *
+     * @param image   The image from which @{@link PhysicsData} will be built
+     * @param quality The @{@link PhysicsData} quality
+     * @return new @{@link PhysicsData}
+     */
     public static PhysicsData buildFromImage(Image image, PhysicsDataQuality quality) {
         PhysicsData physicsData = null;
         if (quality == PhysicsDataQuality.BOUNDS) {
-//            HitPoint hitBox = new HitPoint(null, new Vector2[] {new Vector2(0f, 0f), new Vector2(0f, image.getHeight()),
-//                                                            new Vector2(image.getWidth(), image.getHeight()),
-//                                                            new Vector2(image.getWidth(), 0f)}, false);
-//            physicsData = new PhysicsData(false, new HitPoint[] {hitBox});
             physicsData = buildRectangle(new Vector2(image.getWidth(), image.getHeight()));
         } else if (quality == PhysicsDataQuality.EDGE) {
             // TODO: Per pixel checking... (V:FINAL)
@@ -28,6 +31,12 @@ public class PhysicsDataBuilder {
         return physicsData;
     }
 
+    /**
+     * Builds rectangular @{@link PhysicsData} from given size.
+     *
+     * @param size The size of rectangular @{@link PhysicsData}
+     * @return new @{@link PhysicsData}
+     */
     public static PhysicsData buildRectangle(Vector2 size) {
         return new PhysicsData(new HitPoint[] {
                 new HitPoint(new Vector2[] {

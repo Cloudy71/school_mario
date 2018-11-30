@@ -8,7 +8,10 @@ package cz.cloudy.fxengine.physics;
 
 import cz.cloudy.fxengine.types.Vector2;
 
-public class HitPoint {
+import java.io.Serializable;
+
+public class HitPoint
+        implements Serializable {
     protected Vector2[] polygons;
     protected boolean   trigger;
     protected boolean   solid;

@@ -2,6 +2,7 @@ package cz.cloudy.fxengine.core;
 
 import cz.cloudy.fxengine.interfaces.IGame;
 import cz.cloudy.fxengine.io.KeyboardController;
+import cz.cloudy.fxengine.io.MouseController;
 import cz.cloudy.fxengine.physics.HitPoint;
 import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.surface.Surface;
@@ -73,8 +74,19 @@ public class Renderer {
 //
 //        });
 
-        Main.scene.addEventHandler(MouseEvent.ANY, event -> {
+        Main.scene.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
+            MouseController.addAction(MouseController.MouseActionType.PRESSED, event.getButton());
+            MouseController.addAction(MouseController.MouseActionType.PRESS, event.getButton());
+        });
 
+        Main.scene.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
+            MouseController.addAction(MouseController.MouseActionType.RELEASED, event.getButton());
+            MouseController.removeAction(MouseController.MouseActionType.PRESSED, event.getButton());
+            MouseController.removeAction(MouseController.MouseActionType.PRESS, event.getButton());
+        });
+
+        Main.scene.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+            MouseController.setPosition(new Vector2(event.getX(), event.getY()));
         });
 
         GraphicsContext gc = SurfaceAccessor.getGraphicsContext(surface);
@@ -111,6 +123,7 @@ public class Renderer {
                     lastFixedTime = lastFixedTime + (1_000_000_000 /
                                                      60); // TODO: Better FixedUpdate calculations (moving around 58 ~ 62 fps).
                     KeyboardController.synchronizeKeys();
+                    MouseController.synchronizeActions();
 
                     if (now >= lastFramerateFixedCheck + 1_000_000_000) {
                         currentFixedFramerate = fixedFramerate;
@@ -121,6 +134,7 @@ public class Renderer {
                     }
                 }
                 KeyboardController.removeReleased();
+                MouseController.removeReleased();
                 Render.unlock();
 
                 for (IGame gameHandler : gameHandlers) {
@@ -137,12 +151,11 @@ public class Renderer {
                 }
 
                 if (debugMode) { // Render physics data
-                    gc.setStroke(Color.LIME);
                     for (GameObject gameObject : gameObjectCollector.getGameObjects()) {
                         PhysicsData physicsData = gameObject.getPhysicsData();
                         if (physicsData == null) continue;
 
-                        for (HitPoint hitPoint : physicsData.getHitBoxes()) {
+                        for (HitPoint hitPoint : physicsData.getHitPoints()) {
                             Vector2[] bounds = hitPoint.getPolygons();
                             double[] xPoints = new double[4];
                             double[] yPoints = new double[4];
@@ -152,6 +165,9 @@ public class Renderer {
                             }
                             xPoints[3] = gameObject.getAbsolutePosition().x + bounds[0].x;
                             yPoints[3] = gameObject.getAbsolutePosition().y + bounds[0].y;
+                            if (hitPoint.isSolid()) gc.setStroke(Color.LIME);
+                            else if (hitPoint.isTrigger()) gc.setStroke(Color.PINK);
+                            else gc.setStroke(Color.YELLOW);
                             gc.strokePolyline(xPoints, yPoints, 4);
                         }
                     }

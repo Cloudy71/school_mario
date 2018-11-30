@@ -6,8 +6,10 @@ import cz.cloudy.fxengine.types.Pivot;
 import cz.cloudy.fxengine.types.Vector2;
 import javafx.scene.image.Image;
 
+import java.io.Serializable;
+
 public abstract class GameObject
-        implements IRenderable {
+        implements IRenderable, Serializable {
     private int         id;
     private String      name;
     private Vector2     position;

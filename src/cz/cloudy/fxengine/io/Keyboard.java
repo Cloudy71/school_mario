@@ -41,6 +41,7 @@ public class Keyboard {
         return keyPress.contains(keyCode);
     }
 
+    @SuppressWarnings("Duplicates")
     protected static void addKey(KeyboardController.KeyboardKeyType keyboardKeyType, KeyCode keyCode) {
         switch (keyboardKeyType) {
             case PRESSED:
@@ -57,6 +58,7 @@ public class Keyboard {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     protected static void removeKey(KeyboardController.KeyboardKeyType keyboardKeyType, KeyCode keyCode) {
         switch (keyboardKeyType) {
             case PRESSED:
@@ -87,5 +89,9 @@ public class Keyboard {
 
     protected static void removeReleased() {
         keyReleased.clear();
+    }
+
+    protected static void removePressed() {
+        keyPressed.clear();
     }
 }

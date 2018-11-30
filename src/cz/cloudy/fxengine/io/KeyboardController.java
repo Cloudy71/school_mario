@@ -41,4 +41,11 @@ public class KeyboardController {
         }
         Keyboard.removeReleased();
     }
+
+    public static void removePressed() {
+        if (!CodeAccessProtector.isAccessedFromClass(Renderer.class)) {
+            return;
+        }
+        Keyboard.removePressed();
+    }
 }

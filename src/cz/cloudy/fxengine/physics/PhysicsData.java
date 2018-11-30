@@ -8,9 +8,10 @@ package cz.cloudy.fxengine.physics;
 
 import cz.cloudy.fxengine.types.Vector2;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class PhysicsData {
+public class PhysicsData implements Serializable {
     private boolean    scalable;
     private HitPoint[] hitPoints;
 
@@ -49,7 +50,19 @@ public class PhysicsData {
         return isHit(position) != null;
     }
 
-    public HitPoint[] getHitBoxes() {
+    public HitPoint[] getHitPoints() {
         return Arrays.copyOf(this.hitPoints, this.hitPoints.length);
+    }
+
+    public void setSolid(boolean solid) {
+        for (HitPoint hitPoint : hitPoints) {
+            hitPoint.setSolid(solid);
+        }
+    }
+
+    public void setTrigger(boolean trigger) {
+        for (HitPoint hitPoint : hitPoints) {
+            hitPoint.setTrigger(trigger);
+        }
     }
 }

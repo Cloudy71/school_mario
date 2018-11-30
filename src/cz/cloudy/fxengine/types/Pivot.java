@@ -6,7 +6,10 @@
 
 package cz.cloudy.fxengine.types;
 
-public class Pivot {
+import java.io.Serializable;
+
+public class Pivot
+        implements Serializable {
     public static final Pivot TOP_LEFT() {return new Pivot(new Vector2(.0f, .0f));}
 
     public static final Pivot TOP_CENTER() {return new Pivot(new Vector2(.5f, .0f));}

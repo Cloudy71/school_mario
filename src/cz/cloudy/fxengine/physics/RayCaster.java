@@ -54,7 +54,8 @@ public class RayCaster {
             for (GameObject gameObject : Renderer.instance.getGameObjectCollector()
                                                           .getGameObjects()) {
                 if (gameObject.getPhysicsData()
-                              .isHit(new Vector2(x, y)) != null) {
+                              .isHitOnly(new Vector2(x, y)) || gameObject.getPhysicsData()
+                                                                         .isTriggerOnly(new Vector2(x, y))) {
                     if (!objects.contains(gameObject)) {
                         objects.add(gameObject);
                         if (killOnFirst) break;

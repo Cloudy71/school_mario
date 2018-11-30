@@ -2,8 +2,10 @@ package cz.cloudy.fxengine.types;
 
 import cz.cloudy.fxengine.interfaces.IMeasurable;
 
+import java.io.Serializable;
+
 public class Vector2
-        implements IMeasurable {
+        implements IMeasurable, Serializable {
     public static final Vector2 IDENTITY() { return new Vector2(0f, 0f);}
 
     public static final Vector2 SCALE_IDENTITY() { return new Vector2(1f, 1f);}

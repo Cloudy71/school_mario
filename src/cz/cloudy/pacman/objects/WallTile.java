@@ -1,34 +1,32 @@
 /*
   User: Cloudy
-  Date: 26-Nov-18
-  Time: 19:26
+  Date: 30-Nov-18
+  Time: 21:07
 */
 
 package cz.cloudy.pacman.objects;
 
 import cz.cloudy.fxengine.core.GameObject;
-import cz.cloudy.fxengine.io.Keyboard;
+import cz.cloudy.fxengine.core.Render;
 import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.physics.PhysicsDataBuilder;
-import cz.cloudy.fxengine.types.Pivot;
 import cz.cloudy.fxengine.types.Vector2;
-import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
 
-public class PacMan
+public class WallTile
         extends GameObject {
 
     @Override
     public void create() {
-        setScale(new Vector2(2f, 2f));
-        setPivot(Pivot.CENTER());
         PhysicsData physicsData = PhysicsDataBuilder.buildRectangle(new Vector2(32f, 32f));
-        physicsData.setScalable(false);
         physicsData.setSolid(true);
+        physicsData.setTrigger(false);
         setPhysicsData(physicsData);
     }
 
     @Override
     public void update() {
+
     }
 
     @Override
@@ -37,9 +35,13 @@ public class PacMan
     }
 
     @Override
-    public void fixedUpdate() {
-        if (Keyboard.isKeyPress(KeyCode.UP)) {
-            this.move(new Vector2(0f, -2f));
-        }
+    public void render() {
+        Render.begin()
+              .rect()
+              .setPosition(getPosition())
+              .setPaint(Color.LIGHTBLUE)
+              .setSize(new Vector2(32f, 32f))
+              .end()
+              .finish();
     }
 }
