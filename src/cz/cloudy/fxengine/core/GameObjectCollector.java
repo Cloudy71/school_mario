@@ -1,7 +1,9 @@
 package cz.cloudy.fxengine.core;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class GameObjectCollector {
     private static List<GameObject> gameObjects;
@@ -44,7 +46,7 @@ public class GameObjectCollector {
         return gameObjects.toArray(new GameObject[gameObjects.size()]);
     }
 
-    public <T extends GameObject> T[] getGameObjectsOfType(Class<T> type) {
+    public <T extends GameObject> Set<T> getGameObjectsOfType(Class<T> type) {
         List<T> objects = new LinkedList<>();
         for (GameObject gameObject : getGameObjects()) {
             if (gameObject.getClass()
@@ -53,7 +55,7 @@ public class GameObjectCollector {
             }
         }
 
-        return (T[]) objects.toArray();
+        return new LinkedHashSet<>(objects);
     }
 
     /**

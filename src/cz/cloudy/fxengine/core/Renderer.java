@@ -1,6 +1,6 @@
 package cz.cloudy.fxengine.core;
 
-import cz.cloudy.fxengine.interfaces.IGame;
+import cz.cloudy.fxengine.interfaces.IGameScene;
 import cz.cloudy.fxengine.io.KeyboardController;
 import cz.cloudy.fxengine.io.MouseController;
 import cz.cloudy.fxengine.physics.HitPoint;
@@ -26,16 +26,18 @@ public class Renderer {
     private GameObjectHelper    gameObjectHelper;
     private GameObjectFactory   gameObjectFactory;
 
-    private Surface        surface;
-    private Surface        targetSurface;
-    private List<IGame>    gameHandlers;
-    private AnimationTimer animationTimer;
+    private Surface          surface;
+    private Surface          targetSurface;
+    private List<IGameScene> gameScenes;
+    private IGameScene       gameScene;
+    private AnimationTimer   animationTimer;
 
     private int     currentFramerate;
     private int     framerate;
     private long    lastFramerateCheck;
     private long    lastFixedTime;
     private boolean fixedSection;
+    private boolean executingFixed;
     private int     currentFixedFramerate;
     private int     fixedFramerate;
     private long    lastFramerateFixedCheck;
@@ -54,7 +56,8 @@ public class Renderer {
         surface = new Surface(new Vector2(Main.scene.getWidth(), Main.scene.getHeight()));
         surface.setTarget();
 
-        debugMode = true;
+        executingFixed = false;
+        debugMode = false;
 
         ((Group) Main.scene.getRoot()).getChildren()
                                       .add(SurfaceAccessor.getCanvas(surface));
@@ -62,6 +65,8 @@ public class Renderer {
         Main.scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             KeyboardController.addKey(KeyboardController.KeyboardKeyType.PRESSED, event.getCode());
             KeyboardController.addKey(KeyboardController.KeyboardKeyType.PRESS, event.getCode());
+            System.out.println(event.getCode());
+            // TODO: Is working continuously. Add another list where we will check if it's continuous press.
         });
 
         Main.scene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
@@ -92,30 +97,38 @@ public class Renderer {
         GraphicsContext gc = SurfaceAccessor.getGraphicsContext(surface);
 
         lastFramerateCheck = 0;
-        gameHandlers = new LinkedList<>();
+        gameScenes = new LinkedList<>();
+        gameScene = null;
         this.animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (gameHandlers == null) return;
+                if (gameScene == null) return;
                 if (lastFixedTime == 0) lastFixedTime = now;
 
                 if (now >= lastFramerateCheck + 1_000_000_000) {
                     currentFramerate = framerate;
                     framerate = 0;
                     lastFramerateCheck = now;
-                } else {
+                }
+                else {
                     framerate++;
                 }
 
                 Render.lock();
                 fixedSection = now >= lastFixedTime + 1_000_000_000 / 60;
-                for (IGame gameHandler : gameHandlers) {
-                    gameHandler.update();
-                    if (fixedSection) gameHandler.fixedUpdate();
+                gameScene.update();
+                if (fixedSection) {
+                    executingFixed = true;
+                    gameScene.fixedUpdate();
+                    executingFixed = false;
                 }
                 for (GameObject gameObject : gameObjectCollector.getGameObjects()) {
                     gameObject.update();
-                    if (fixedSection) gameObject.fixedUpdate();
+                    if (fixedSection) {
+                        executingFixed = true;
+                        gameObject.fixedUpdate();
+                        executingFixed = false;
+                    }
                 }
                 if (fixedSection) {
 //                    lastFixedTime = now - (now - (lastFixedTime + 1_000_000_000 / 60));
@@ -129,26 +142,25 @@ public class Renderer {
                         currentFixedFramerate = fixedFramerate;
                         fixedFramerate = 0;
                         lastFramerateFixedCheck = now;
-                    } else {
+                    }
+                    else {
                         fixedFramerate++;
                     }
                 }
                 KeyboardController.removeReleased();
+                KeyboardController.removePressed();
                 MouseController.removeReleased();
+                MouseController.removePressed();
                 Render.unlock();
 
-                for (IGame gameHandler : gameHandlers) {
-                    gameHandler.render();
-                }
+                gameScene.render();
 
                 // TODO: Object rendering.
                 for (GameObject gameObject : gameObjectCollector.getGameObjects()) {
                     gameObject.render();
                 }
 
-                for (IGame gameHandler : gameHandlers) {
-                    gameHandler.aboveRender();
-                }
+                gameScene.aboveRender();
 
                 if (debugMode) { // Render physics data
                     for (GameObject gameObject : gameObjectCollector.getGameObjects()) {
@@ -174,6 +186,7 @@ public class Renderer {
                 }
             }
         };
+        animationTimer.start();
     }
 
     public static Renderer get() {
@@ -201,14 +214,26 @@ public class Renderer {
         return this.targetSurface;
     }
 
-    public void addGameHandler(IGame gameHandler) {
-        this.gameHandlers.add(gameHandler);
-        gameHandler.start();
-        this.animationTimer.start();
+    public int addGameScene(IGameScene gameScene) {
+        this.gameScenes.add(gameScene);
+        gameScene.start();
+        return this.gameScenes.size() - 1;
+    }
+
+    public void setGameScene(int gameSceneId) {
+        if (this.gameScene != null)
+            this.gameScene.end();
+        this.gameScene = (gameSceneId < this.gameScenes.size()) ? gameScenes.get(gameSceneId) : null;
+        if (this.gameScene != null)
+            this.gameScene.start();
+    }
+
+    public Class<? extends IGameScene> getGameScene() {
+        return this.gameScene != null ? this.gameScene.getClass() : null;
     }
 
     public boolean isFixedSection() {
-        return this.fixedSection;
+        return this.executingFixed;
     }
 
     public int getFramerate() {

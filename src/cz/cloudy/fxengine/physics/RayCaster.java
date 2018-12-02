@@ -29,8 +29,9 @@ public class RayCaster {
      */
     public static <T> T castLine(Class<T> result, Vector2 start, Vector2 end) {
         if (result == GameObject.class) { // Single object, the nearest to start vector.
-            return (T) calculateLine(start, end, true)[0];
-        } else if (result == GameObject[].class) { // All objects in line.
+            return (T) (calculateLine(start, end, true)[0]);
+        }
+        else if (result == GameObject[].class) { // All objects in line.
             return (T) calculateLine(start, end, false);
         }
         // TODO: Make line intersection.
@@ -57,17 +58,51 @@ public class RayCaster {
                               .isHitOnly(new Vector2(x, y)) || gameObject.getPhysicsData()
                                                                          .isTriggerOnly(new Vector2(x, y))) {
                     if (!objects.contains(gameObject)) {
+                        if (killOnFirst)
+                            return new GameObject[]{gameObject};
                         objects.add(gameObject);
-                        if (killOnFirst) break;
                     }
                 }
             }
-
-            if (objects.size() > 0 && killOnFirst) break;
         }
 
         if (objects.size() == 0 && killOnFirst) {
-            return new GameObject[] {null};
+            return new GameObject[]{null};
+        }
+
+        return objects.toArray(new GameObject[0]);
+    }
+
+    public static <T> T castPoint(Class<T> result, Vector2 position) {
+        if (result == GameObject.class) {
+            return (T) (calculatePoint(position, true)[0]);
+        }
+        else if (result == GameObject[].class) {
+            return (T) calculatePoint(position, false);
+        }
+
+        return null;
+    }
+
+    private static GameObject[] calculatePoint(Vector2 position, boolean killOnFirst) {
+        List<GameObject> objects = new LinkedList<>();
+
+        for (GameObject gameObject : Renderer.instance.getGameObjectCollector()
+                                                      .getGameObjects()) {
+            if (gameObject.getPhysicsData()
+                          .isHitOnly(position) || gameObject.getPhysicsData()
+                                                            .isTriggerOnly(position)) {
+                if (!objects.contains(gameObject)) {
+                    if (killOnFirst)
+                        return new GameObject[]{gameObject};
+
+                    objects.add(gameObject);
+                }
+            }
+        }
+
+        if (objects.size() == 0 && killOnFirst) {
+            return new GameObject[]{null};
         }
 
         return objects.toArray(new GameObject[0]);

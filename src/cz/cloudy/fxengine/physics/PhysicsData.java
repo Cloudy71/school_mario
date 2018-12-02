@@ -6,6 +6,7 @@
 
 package cz.cloudy.fxengine.physics;
 
+import cz.cloudy.fxengine.core.GameObject;
 import cz.cloudy.fxengine.types.Vector2;
 
 import java.io.Serializable;
@@ -14,10 +15,12 @@ import java.util.Arrays;
 public class PhysicsData implements Serializable {
     private boolean    scalable;
     private HitPoint[] hitPoints;
+    private GameObject parent;
 
     protected PhysicsData(HitPoint[] hitPoints) {
         this.scalable = true;
         this.hitPoints = hitPoints;
+        this.parent = null;
     }
 
     public void setScalable(boolean scalable) {
@@ -29,6 +32,10 @@ public class PhysicsData implements Serializable {
     }
 
     public HitPoint isTrigger(Vector2 position) {
+        if (this.parent != null)
+            position = position.copy()
+                               .subtract(this.parent.getPosition());
+
         for (HitPoint hitPoint : hitPoints) {
             if (hitPoint.isTrigger() && hitPoint.isHit(position)) return hitPoint;
         }
@@ -36,6 +43,10 @@ public class PhysicsData implements Serializable {
     }
 
     public HitPoint isHit(Vector2 position) {
+        if (this.parent != null)
+            position = position.copy()
+                               .subtract(this.parent.getPosition());
+
         for (HitPoint hitPoint : hitPoints) {
             if (hitPoint.isSolid() && hitPoint.isHit(position)) return hitPoint;
         }
@@ -64,5 +75,13 @@ public class PhysicsData implements Serializable {
         for (HitPoint hitPoint : hitPoints) {
             hitPoint.setTrigger(trigger);
         }
+    }
+
+    public GameObject getParent() {
+        return parent;
+    }
+
+    public void setParent(GameObject parent) {
+        this.parent = parent;
     }
 }

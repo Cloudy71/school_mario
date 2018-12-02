@@ -6,14 +6,19 @@
 
 package cz.cloudy.fxengine.interfaces;
 
-public interface IGame {
+public interface IGameScene {
     void start();
 
     void update();
 
-    default void fixedUpdate() {}
+    default void fixedUpdate() {
+    }
 
-    default void aboveRender() {}
+    default void aboveRender() {
+    }
 
     void render();
+
+    default void end() {
+    }
 }

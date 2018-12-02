@@ -6,9 +6,13 @@ import java.io.Serializable;
 
 public class Vector2
         implements IMeasurable, Serializable {
-    public static final Vector2 IDENTITY() { return new Vector2(0f, 0f);}
+    public static final Vector2 IDENTITY() {
+        return new Vector2(0f, 0f);
+    }
 
-    public static final Vector2 SCALE_IDENTITY() { return new Vector2(1f, 1f);}
+    public static final Vector2 SCALE_IDENTITY() {
+        return new Vector2(1f, 1f);
+    }
 
     public float x;
     public float y;
@@ -42,6 +46,10 @@ public class Vector2
 
     public Vector2 add(Vector2 offset) {
         return move(offset);
+    }
+
+    public Vector2 subtract(Vector2 offset) {
+        return move(new Vector2(-offset.x, -offset.y));
     }
 
     public float distance(Vector2 point) {

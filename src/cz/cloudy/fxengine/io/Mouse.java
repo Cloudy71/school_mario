@@ -67,13 +67,15 @@ public class Mouse {
             case PRESSED:
                 if (Renderer.instance.isFixedSection()) {
                     mousePressedFixed.remove(mouseButton);
-                } else {
+                }
+                else {
                     mousePressed.remove(mouseButton);
                 }
             case RELEASED:
                 if (Renderer.instance.isFixedSection()) {
                     mouseReleasedFixed.remove(mouseButton);
-                } else {
+                }
+                else {
                     mouseReleased.remove(mouseButton);
                 }
             case PRESS:
@@ -103,6 +105,6 @@ public class Mouse {
     }
 
     public static Vector2 getPosition() {
-        return Mouse.position;
+        return Mouse.position.copy();
     }
 }

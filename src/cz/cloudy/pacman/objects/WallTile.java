@@ -21,6 +21,7 @@ public class WallTile
         PhysicsData physicsData = PhysicsDataBuilder.buildRectangle(new Vector2(32f, 32f));
         physicsData.setSolid(true);
         physicsData.setTrigger(false);
+        physicsData.setParent(this);
         setPhysicsData(physicsData);
     }
 

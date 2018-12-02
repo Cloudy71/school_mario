@@ -17,6 +17,8 @@ import javafx.scene.input.KeyCode;
 public class PacMan
         extends GameObject {
 
+    private int side;
+
     @Override
     public void create() {
         setScale(new Vector2(2f, 2f));
@@ -24,6 +26,7 @@ public class PacMan
         PhysicsData physicsData = PhysicsDataBuilder.buildRectangle(new Vector2(32f, 32f));
         physicsData.setScalable(false);
         physicsData.setSolid(true);
+        physicsData.setParent(this);
         setPhysicsData(physicsData);
     }
 
