@@ -6,7 +6,6 @@
 
 package cz.cloudy.fxengine.core;
 
-import cz.cloudy.fxengine.surface.SurfaceAccessor;
 import cz.cloudy.fxengine.types.Vector2;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
@@ -77,13 +76,15 @@ public class Render {
     }
 
     protected static GraphicsContext getContext() {
-        return SurfaceAccessor.getGraphicsContext(Renderer.get()
-                                                          .getCurrentTarget());
+        return Renderer.get()
+                       .getCurrentTarget()
+                       .getGraphicsContext();
     }
 
     protected static Canvas getCanvas() {
-        return SurfaceAccessor.getCanvas(Renderer.get()
-                                                 .getCurrentTarget());
+        return Renderer.get()
+                       .getCurrentTarget()
+                       .getCanvas();
     }
 
     protected Render addToQueue(IRenderInstance shapeRender) {

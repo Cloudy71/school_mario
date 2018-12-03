@@ -1,6 +1,5 @@
-package cz.cloudy.fxengine.surface;
+package cz.cloudy.fxengine.core;
 
-import cz.cloudy.fxengine.core.Renderer;
 import cz.cloudy.fxengine.types.Vector2;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;

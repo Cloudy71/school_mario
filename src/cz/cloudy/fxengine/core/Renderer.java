@@ -5,8 +5,6 @@ import cz.cloudy.fxengine.io.KeyboardController;
 import cz.cloudy.fxengine.io.MouseController;
 import cz.cloudy.fxengine.physics.HitPoint;
 import cz.cloudy.fxengine.physics.PhysicsData;
-import cz.cloudy.fxengine.surface.Surface;
-import cz.cloudy.fxengine.surface.SurfaceAccessor;
 import cz.cloudy.fxengine.types.Vector2;
 import cz.cloudy.pacman.Main;
 import javafx.animation.AnimationTimer;
@@ -60,7 +58,7 @@ public class Renderer {
         debugMode = false;
 
         ((Group) Main.scene.getRoot()).getChildren()
-                                      .add(SurfaceAccessor.getCanvas(surface));
+                                      .add(surface.getCanvas());
 
         Main.scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             KeyboardController.addKey(KeyboardController.KeyboardKeyType.PRESSED, event.getCode());
@@ -94,7 +92,7 @@ public class Renderer {
             MouseController.setPosition(new Vector2(event.getX(), event.getY()));
         });
 
-        GraphicsContext gc = SurfaceAccessor.getGraphicsContext(surface);
+        GraphicsContext gc = surface.getGraphicsContext();
 
         lastFramerateCheck = 0;
         gameScenes = new LinkedList<>();
@@ -109,8 +107,7 @@ public class Renderer {
                     currentFramerate = framerate;
                     framerate = 0;
                     lastFramerateCheck = now;
-                }
-                else {
+                } else {
                     framerate++;
                 }
 
@@ -142,8 +139,7 @@ public class Renderer {
                         currentFixedFramerate = fixedFramerate;
                         fixedFramerate = 0;
                         lastFramerateFixedCheck = now;
-                    }
-                    else {
+                    } else {
                         fixedFramerate++;
                     }
                 }
@@ -200,7 +196,7 @@ public class Renderer {
      */
     public void setRenderTarget(Surface surface) {
         this.targetSurface = surface;
-        SurfaceAccessor.setRedrawFlag(surface);
+        surface.setRedrawFlag();
     }
 
     /**
@@ -215,17 +211,25 @@ public class Renderer {
     }
 
     public int addGameScene(IGameScene gameScene) {
+        if (this.gameScenes.contains(gameScene)) return this.gameScenes.indexOf(gameScene);
         this.gameScenes.add(gameScene);
-        gameScene.start();
         return this.gameScenes.size() - 1;
     }
 
     public void setGameScene(int gameSceneId) {
-        if (this.gameScene != null)
-            this.gameScene.end();
+        if (this.gameScene != null) this.gameScene.end();
         this.gameScene = (gameSceneId < this.gameScenes.size()) ? gameScenes.get(gameSceneId) : null;
-        if (this.gameScene != null)
-            this.gameScene.start();
+        if (this.gameScene != null) this.gameScene.start();
+    }
+
+    public void setGameScene(Class<? extends IGameScene> gameSceneClass) {
+        for (int i = 0; i < this.gameScenes.size(); i++) {
+            if (this.gameScenes.get(i)
+                               .getClass() == gameSceneClass) {
+                setGameScene(i);
+                return;
+            }
+        }
     }
 
     public Class<? extends IGameScene> getGameScene() {

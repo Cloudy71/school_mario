@@ -5,7 +5,8 @@ import cz.cloudy.pacman.objects.WallTile;
 
 import java.io.Serializable;
 
-public class GameMap implements Serializable {
+public class GameMap
+        implements Serializable {
     private String     name;
     private WallTile[] wallTiles;
     private MoveTile[] moveTiles;

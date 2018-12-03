@@ -18,6 +18,7 @@ import javafx.scene.paint.Color;
 
 public class MoveTile
         extends GameObject {
+    private int type;
 
     @Override
     public void create() {
@@ -27,6 +28,8 @@ public class MoveTile
         physicsData.setTrigger(true);
         physicsData.setParent(this);
         setPhysicsData(physicsData);
+
+        this.type = 0;
     }
 
     @Override
@@ -39,43 +42,91 @@ public class MoveTile
 
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    private float[] calcSizes(GameObject collider) {
+        float p1 = 16f + 4f;
+        float p2 = type == 0 ? 24f : 20f;
+        if (collider.getClass() == MoveTile.class) {
+            MoveTile moveTile = (MoveTile) collider;
+            if (moveTile.getType() != 0) {
+                p1 = 16f + 8f;
+                p2 = 24f - (type != 0 ? 4f : 0f) - 4f;
+            }
+        }
+        return new float[] {
+                p1,
+                p2
+        };
+    }
+
     @Override
     public void render() {
+        Render r = Render.begin();
+        GameObject collider = RayCaster.castPoint(GameObject.class, getPosition().copy()
+                                                                                 .add(new Vector2(16f, 16 - 32f)));
+        if (collider != null && collider.getClass() == MoveTile.class) {
+            float[] sizes = calcSizes(collider);
+
+            r.rect()
+             .setPosition(collider.getPosition()
+                                  .copy()
+                                  .add(new Vector2(16f, sizes[0])))
+             .setSize(new Vector2(2f, sizes[1]))
+             .setPaint(Color.PINK)
+             .end();
+        }
+        collider = RayCaster.castPoint(GameObject.class, getPosition().copy()
+                                                                      .add(new Vector2(16f - 32f, 16f)));
+        if (collider != null && collider.getClass() == MoveTile.class) {
+            float[] sizes = calcSizes(collider);
+
+            r.rect()
+             .setPosition(collider.getPosition()
+                                  .copy()
+                                  .add(new Vector2(sizes[0], 16f)))
+             .setSize(new Vector2(sizes[1], 2f))
+             .setPaint(Color.PINK)
+             .end();
+        }
+
+        r.finish();
+
         if (Renderer.instance.getGameScene() == EditorScene.class) {
-            Render.begin()
-                  .rect()
-                  .setPosition(getPosition().copy()
-                                            .add(new Vector2(12f, 12f)))
-                  .setPaint(Color.LIGHTGREEN)
-                  .setSize(new Vector2(8f, 8f))
-                  .end()
-                  .finish();
-
-            Render r = Render.begin();
-            GameObject collider = RayCaster.castPoint(GameObject.class, getPosition().copy()
-                                                                                     .add(new Vector2(16f, 16 - 32f)));
-            if (collider != null && collider.getClass() == MoveTile.class) {
-                r.rect()
-                 .setPosition(collider.getPosition()
-                                      .copy()
-                                      .add(new Vector2(16f, 16f)))
-                 .setSize(new Vector2(2f, 32f))
-                 .setPaint(Color.DARKGREEN)
-                 .end();
+            if (type == 0) {
+                Render.begin()
+                      .rect()
+                      .setPosition(getPosition().copy()
+                                                .add(new Vector2(12f, 12f)))
+                      .setPaint(Color.LIGHTGREEN)
+                      .setSize(new Vector2(8f, 8f))
+                      .end()
+                      .finish();
+            } else if (type == 1) {
+                Render.begin()
+                      .rect()
+                      .setPosition(getPosition().copy()
+                                                .add(new Vector2(8f, 8f)))
+                      .setPaint(Color.YELLOW)
+                      .setSize(new Vector2(16f, 16f))
+                      .end()
+                      .finish();
+            } else if (type == 2) {
+                Render.begin()
+                      .rect()
+                      .setPosition(getPosition().copy()
+                                                .add(new Vector2(8f, 8f)))
+                      .setPaint(Color.GHOSTWHITE)
+                      .setSize(new Vector2(16f, 16f))
+                      .end()
+                      .finish();
             }
-            collider = RayCaster.castPoint(GameObject.class, getPosition().copy()
-                                                                          .add(new Vector2(16f - 32f, 16f)));
-            if (collider != null && collider.getClass() == MoveTile.class) {
-                r.rect()
-                 .setPosition(collider.getPosition()
-                                      .copy()
-                                      .add(new Vector2(16f, 16f)))
-                 .setSize(new Vector2(32f, 2f))
-                 .setPaint(Color.DARKGREEN)
-                 .end();
-            }
-
-            r.finish();
         }
     }
 }
