@@ -135,6 +135,8 @@ public class Render {
         return new RectangleRender();
     }
 
+    public LineRender line() {return new LineRender();}
+
     public TextureRender tex() {
         return new TextureRender();
     }

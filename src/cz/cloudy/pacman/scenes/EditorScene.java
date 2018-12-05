@@ -18,7 +18,10 @@ import cz.cloudy.pacman.objects.WallTile;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
@@ -90,6 +93,7 @@ public class EditorScene
             }
         }
         if (Mouse.isMousePressed(MouseButton.SECONDARY)) {
+            // TODO: Bug while changing its type. (if there are 3 ghost spawns, another spawn cannot be removed.)
             Vector2 position = getSnappedMousePosition();
             GameObject collider = RayCaster.castPoint(GameObject.class, position);
             if (collider != null && collider.getClass() == WallTile.class) {
@@ -151,6 +155,29 @@ public class EditorScene
                 e.printStackTrace();
                 return;
             }
+        } else if (Keyboard.isKeyPressed(KeyCode.L)) {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters()
+                       .addAll(new FileChooser.ExtensionFilter("Java Serialization Binary", "*.jsb"));
+            fileChooser.setTitle("Load map");
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+            File file = fileChooser.showOpenDialog(Main.scene.getWindow());
+
+            if (file != null) {
+                filename = file.getAbsolutePath()
+                               .substring(0, file.getAbsolutePath()
+                                                 .lastIndexOf("."));
+                try {
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    GameMap gameMap = SerializationUtils.deconvert(fileInputStream.readAllBytes());
+                    fileInputStream.close();
+                    gameMap.registerObjects();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+            }
         }
     }
 
@@ -190,12 +217,27 @@ public class EditorScene
               .finish();
         Renderer.instance.resetRenderTarget();
 
-        Render.begin()
-              .color()
-              .paint(Color.BLACK)
-              .end()
-              .clear(true)
-              .finish();
+        Render r = Render.begin();
+        r.color()
+         .paint(Color.BLACK)
+         .end()
+         .clear(true);
+        // Map Grid
+        for (int i = 0; i < Main.scene.getWidth() / 32; i++) {
+            r.line()
+             .startPoint(new Vector2(32f * i, 0f))
+             .endPoint(new Vector2(32f * i, Main.scene.getHeight()))
+             .setPaint(Color.GRAY)
+             .end();
+        }
+        for (int i = 0; i < Main.scene.getHeight() / 32; i++) {
+            r.line()
+             .startPoint(new Vector2(0f, 32f * i))
+             .endPoint(new Vector2(Main.scene.getWidth(), 32f * i))
+             .setPaint(Color.GRAY)
+             .end();
+        }
+        r.finish();
     }
 
     @Override

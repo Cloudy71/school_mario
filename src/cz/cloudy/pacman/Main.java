@@ -16,14 +16,12 @@ public class Main
         launch(args);
     }
 
-    public <T extends Double> void addToList(T a) {
-
-    }
+    // TODO: Map WH: 21
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         Group root = new Group();
-        scene = new Scene(root, 800, 600);
+        scene = new Scene(root, 800, 800);
         primaryStage.setTitle("PacMan");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -31,6 +29,6 @@ public class Main
         renderer = Renderer.get();
 
         Renderer.instance.addGameScene(new EditorScene());
-        Renderer.instance.setGameScene(0);
+        Renderer.instance.setGameScene(EditorScene.class);
     }
 }

@@ -16,7 +16,7 @@ public class GameObjectFactory {
             gameObjectCollector.requestNewId();
             T t = (T) clazz.getDeclaredConstructor()
                            .newInstance();
-            addObject(t);
+            addObject(t, true);
             return t;
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -30,14 +30,23 @@ public class GameObjectFactory {
         return null;
     }
 
+    public static void registerExistingObject(GameObject gameObject) {
+        for (GameObject object : gameObjectCollector.getGameObjects()) {
+            if (object.equals(gameObject)) {
+                return;
+            }
+        }
+        addObject(gameObject, false);
+    }
+
     /**
      * Adds new GameObject into {@link GameObjectCollector}
      *
      * @param gameObject GameObject which should be added
      */
-    private static void addObject(GameObject gameObject) {
+    private static void addObject(GameObject gameObject, boolean initialCreate) {
         gameObjectCollector.addGameObject(gameObject);
-        gameObject.create();
+        if (initialCreate) gameObject.create();
     }
 
     /**
