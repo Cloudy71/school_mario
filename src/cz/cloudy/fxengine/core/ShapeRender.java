@@ -21,8 +21,8 @@ public abstract class ShapeRender<T extends ShapeRender>
     protected ShapeRender() {
         Render basic = Render.begin(true);
         this.paint = basic.getColor();
-        this.position = Vector2.IDENTITY();
-        this.size = Vector2.IDENTITY();
+        this.position = Vector2.ZERO();
+        this.size = Vector2.ZERO();
         this.pivot = Pivot.TOP_LEFT();
     }
 

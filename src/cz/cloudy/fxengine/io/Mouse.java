@@ -27,7 +27,7 @@ public class Mouse {
         mouseReleased = new LinkedList<>();
         mouseReleasedFixed = new LinkedList<>();
         mousePress = new LinkedList<>();
-        position = Vector2.IDENTITY();
+        position = Vector2.ZERO();
     }
 
     public static boolean isMousePressed(MouseButton mouseButton) {

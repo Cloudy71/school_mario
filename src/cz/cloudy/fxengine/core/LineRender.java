@@ -18,8 +18,8 @@ public class LineRender
     protected LineRender() {
         super();
 
-        this.start = Vector2.IDENTITY();
-        this.end = Vector2.IDENTITY();
+        this.start = Vector2.ZERO();
+        this.end = Vector2.ZERO();
     }
 
     public LineRender startPoint(Vector2 start) {

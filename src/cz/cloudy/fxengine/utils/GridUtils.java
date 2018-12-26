@@ -14,6 +14,6 @@ public class GridUtils {
     }
 
     public static Vector2 snapToGrid(Vector2 position, Vector2 grid) {
-        return snapToGrid(position, grid, Vector2.IDENTITY());
+        return snapToGrid(position, grid, Vector2.ZERO());
     }
 }

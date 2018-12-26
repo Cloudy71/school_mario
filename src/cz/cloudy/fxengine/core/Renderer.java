@@ -6,19 +6,21 @@ import cz.cloudy.fxengine.io.MouseController;
 import cz.cloudy.fxengine.physics.HitPoint;
 import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.types.Vector2;
-import cz.cloudy.pacman.Main;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Renderer {
-    public static Renderer instance;
+    public static  Renderer instance;
+    private static Stage    mainStage;
 
     private GameObjectCollector gameObjectCollector;
     private GameObjectHelper    gameObjectHelper;
@@ -40,6 +42,7 @@ public class Renderer {
     private int     fixedFramerate;
     private long    lastFramerateFixedCheck;
     private boolean debugMode;
+    private long    time;
 
     /**
      * Will create new {@link Surface}.
@@ -51,46 +54,54 @@ public class Renderer {
         gameObjectFactory = new GameObjectFactory(gameObjectCollector, gameObjectHelper);
 
         instance = this;
-        surface = new Surface(new Vector2(Main.scene.getWidth(), Main.scene.getHeight()));
+        surface = new Surface(new Vector2(mainStage.getScene()
+                                                   .getWidth(), mainStage.getScene()
+                                                                         .getHeight()));
         surface.setTarget();
 
         executingFixed = false;
         debugMode = false;
 
-        ((Group) Main.scene.getRoot()).getChildren()
-                                      .add(surface.getCanvas());
+        ((Group) mainStage.getScene()
+                          .getRoot()).getChildren()
+                                     .add(surface.getCanvas());
 
-        Main.scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            KeyboardController.addKey(KeyboardController.KeyboardKeyType.PRESSED, event.getCode());
-            KeyboardController.addKey(KeyboardController.KeyboardKeyType.PRESS, event.getCode());
-            System.out.println(event.getCode());
-            // TODO: Is working continuously. Add another list where we will check if it's continuous press.
-        });
+        mainStage.getScene()
+                 .addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+                     KeyboardController.addKey(KeyboardController.KeyboardKeyType.PRESSED, event.getCode());
+                     KeyboardController.addKey(KeyboardController.KeyboardKeyType.PRESS, event.getCode());
+                     System.out.println(event.getCode());
+                     // TODO: Is working continuously. Add another list where we will check if it's continuous press.
+                 });
 
-        Main.scene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            KeyboardController.addKey(KeyboardController.KeyboardKeyType.RELEASED, event.getCode());
-            KeyboardController.removeKey(KeyboardController.KeyboardKeyType.PRESSED, event.getCode());
-            KeyboardController.removeKey(KeyboardController.KeyboardKeyType.PRESS, event.getCode());
-        });
+        mainStage.getScene()
+                 .addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+                     KeyboardController.addKey(KeyboardController.KeyboardKeyType.RELEASED, event.getCode());
+                     KeyboardController.removeKey(KeyboardController.KeyboardKeyType.PRESSED, event.getCode());
+                     KeyboardController.removeKey(KeyboardController.KeyboardKeyType.PRESS, event.getCode());
+                 });
 
-//        Main.scene.addEventHandler(KeyEvent.KEY_TYPED, event -> {
+//        mainStage.getScene().addEventHandler(KeyEvent.KEY_TYPED, event -> {
 //
 //        });
 
-        Main.scene.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            MouseController.addAction(MouseController.MouseActionType.PRESSED, event.getButton());
-            MouseController.addAction(MouseController.MouseActionType.PRESS, event.getButton());
-        });
+        mainStage.getScene()
+                 .addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
+                     MouseController.addAction(MouseController.MouseActionType.PRESSED, event.getButton());
+                     MouseController.addAction(MouseController.MouseActionType.PRESS, event.getButton());
+                 });
 
-        Main.scene.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
-            MouseController.addAction(MouseController.MouseActionType.RELEASED, event.getButton());
-            MouseController.removeAction(MouseController.MouseActionType.PRESSED, event.getButton());
-            MouseController.removeAction(MouseController.MouseActionType.PRESS, event.getButton());
-        });
+        mainStage.getScene()
+                 .addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
+                     MouseController.addAction(MouseController.MouseActionType.RELEASED, event.getButton());
+                     MouseController.removeAction(MouseController.MouseActionType.PRESSED, event.getButton());
+                     MouseController.removeAction(MouseController.MouseActionType.PRESS, event.getButton());
+                 });
 
-        Main.scene.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
-            MouseController.setPosition(new Vector2(event.getX(), event.getY()));
-        });
+        mainStage.getScene()
+                 .addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+                     MouseController.setPosition(new Vector2(event.getX(), event.getY()));
+                 });
 
         GraphicsContext gc = surface.getGraphicsContext();
 
@@ -110,6 +121,8 @@ public class Renderer {
                 } else {
                     framerate++;
                 }
+
+                time = now;
 
                 Render.lock();
                 fixedSection = now >= lastFixedTime + 1_000_000_000 / 60;
@@ -147,6 +160,13 @@ public class Renderer {
                 KeyboardController.removePressed();
                 MouseController.removeReleased();
                 MouseController.removePressed();
+
+                for (Timer timer : TimerService.timers) {
+                    if (now >= timer.end) {
+                        TimerService.executeTimer(timer.id);
+                    }
+                }
+
                 Render.unlock();
 
                 gameScene.render();
@@ -186,7 +206,12 @@ public class Renderer {
     }
 
     public static Renderer get() {
-        return instance == null ? new Renderer() : instance;
+        return instance;
+    }
+
+    public static Renderer instantiate(Stage stage) {
+        mainStage = stage;
+        return new Renderer();
     }
 
     /**
@@ -213,6 +238,24 @@ public class Renderer {
     public int addGameScene(IGameScene gameScene) {
         if (this.gameScenes.contains(gameScene)) return this.gameScenes.indexOf(gameScene);
         this.gameScenes.add(gameScene);
+        return this.gameScenes.size() - 1;
+    }
+
+    public int addGameScene(Class<? extends IGameScene> gameScene) {
+        for (int i = 0; i < this.gameScenes.size(); i++) {
+            if (this.gameScenes.get(i)
+                               .getClass()
+                               .equals(gameScene)) {
+                return i;
+            }
+        }
+        try {
+            this.gameScenes.add(gameScene.getDeclaredConstructor()
+                                         .newInstance());
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+            return -1;
+        }
         return this.gameScenes.size() - 1;
     }
 
@@ -250,6 +293,16 @@ public class Renderer {
 
     public boolean isDebugMode() {
         return this.debugMode;
+    }
+
+    public long getTime() {
+        return this.time;
+    }
+
+    public Vector2 getSceneSize() {
+        return new Vector2(mainStage.getScene()
+                                    .getWidth(), mainStage.getScene()
+                                                          .getHeight());
     }
 
     public GameObjectCollector getGameObjectCollector() {

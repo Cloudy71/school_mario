@@ -26,7 +26,7 @@ public class HitPoint
             Vector2[] polys = new Vector2[3];
             for (int i = 0; i < 3; i++) {
                 if (polygons.length > i) polys[i] = polygons[i];
-                else polys[i] = Vector2.IDENTITY();
+                else polys[i] = Vector2.ZERO();
             }
             this.polygons = polys;
         }

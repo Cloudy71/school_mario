@@ -54,7 +54,7 @@ public class Render {
 
     public static Render begin(boolean dirtyRender) {
         if (locked) return null;
-        return instance == null ? new Render() : ((dirtyRender) ? instance : getCleanRender());
+        return instance == null ? new Render() : (dirtyRender ? instance : getCleanRender());
     }
 
     public static Render begin() {
@@ -101,8 +101,8 @@ public class Render {
     }
 
     private void resetTransform() {
-        this.transformPosition = Vector2.IDENTITY();
-        this.transformSize = Vector2.IDENTITY();
+        this.transformPosition = Vector2.ZERO();
+        this.transformSize = Vector2.ZERO();
     }
 
     public Paint getColor() {
@@ -122,7 +122,7 @@ public class Render {
     }
 
     public Render clear(boolean solid) {
-        return solid ? rect().setPosition(Vector2.IDENTITY())
+        return solid ? rect().setPosition(Vector2.ZERO())
                              .setSize(new Vector2(getCanvas().getWidth(), getCanvas().getHeight()))
                              .end() : new ClearRender().end();
     }
@@ -134,6 +134,8 @@ public class Render {
     public RectangleRender rect() {
         return new RectangleRender();
     }
+
+    public OvalRender oval() {return new OvalRender();}
 
     public LineRender line() {return new LineRender();}
 

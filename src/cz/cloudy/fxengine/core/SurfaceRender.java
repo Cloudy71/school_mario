@@ -16,7 +16,7 @@ public class SurfaceRender
 
     protected SurfaceRender() {
         super();
-        this.size = Vector2.SCALE_IDENTITY();
+        this.size = Vector2.SCALE();
     }
 
     public SurfaceRender setSurface(Surface surface) {

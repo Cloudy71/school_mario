@@ -19,14 +19,15 @@ public class Main
     // TODO: Map WH: 21
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         Group root = new Group();
         scene = new Scene(root, 800, 800);
         primaryStage.setTitle("PacMan");
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.show();
 
-        renderer = Renderer.get();
+        renderer = Renderer.instantiate(primaryStage);
 
         Renderer.instance.addGameScene(new EditorScene());
         Renderer.instance.setGameScene(EditorScene.class);

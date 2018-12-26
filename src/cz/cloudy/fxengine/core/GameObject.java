@@ -40,9 +40,9 @@ public abstract class GameObject
         this.name = name != null ? name : this.getClass()
                                               .getSimpleName() + "_" + id;
 
-        this.position = Vector2.IDENTITY();
+        this.position = Vector2.ZERO();
         this.rotation = 0f;
-        this.scale = Vector2.SCALE_IDENTITY();
+        this.scale = Vector2.SCALE();
         this.sprite = null;
         this.depth = 0;
         this.pivot = Pivot.TOP_LEFT();

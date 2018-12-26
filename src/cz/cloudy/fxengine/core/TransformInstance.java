@@ -32,8 +32,8 @@ public class TransformInstance
     }
 
     public TransformInstance reset() {
-        this.position = Vector2.IDENTITY();
-        this.size = Vector2.IDENTITY();
+        this.position = Vector2.ZERO();
+        this.size = Vector2.ZERO();
 
         return this;
     }

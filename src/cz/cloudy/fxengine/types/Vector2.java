@@ -6,11 +6,11 @@ import java.io.Serializable;
 
 public class Vector2
         implements IMeasurable, Serializable {
-    public static final Vector2 IDENTITY() {
+    public static final Vector2 ZERO() {
         return new Vector2(0f, 0f);
     }
 
-    public static final Vector2 SCALE_IDENTITY() {
+    public static final Vector2 SCALE() {
         return new Vector2(1f, 1f);
     }
 

@@ -253,7 +253,7 @@ public class EditorScene
               .end()
               .surface()
               .setSurface(subSurface)
-              .setPosition(Vector2.IDENTITY())
+              .setPosition(Vector2.ZERO())
               .end()
               .transform()
               .reset()
