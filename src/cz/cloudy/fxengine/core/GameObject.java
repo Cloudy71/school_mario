@@ -139,7 +139,7 @@ public abstract class GameObject
     /**
      * Is invoked when destroy is executed on actual GameObject.
      */
-    public abstract void dispose();
+    protected abstract void dispose();
 
     @Override
     public void render() {

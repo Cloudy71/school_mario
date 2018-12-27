@@ -31,7 +31,7 @@ public class WallTile
     }
 
     @Override
-    public void dispose() {
+    protected void dispose() {
 
     }
 

@@ -6,7 +6,9 @@
 
 package cz.cloudy.fxengine.core;
 
-public class Timer {
+import cz.cloudy.fxengine.interfaces.IWorkable;
+
+public class Timer implements IWorkable {
     private static int ids = 0;
 
     protected int  id;
@@ -18,5 +20,13 @@ public class Timer {
         this.start = start;
         this.end = end;
         this.callback = callback;
+    }
+
+    @Override
+    public boolean work() {
+        if (Renderer.get()
+                    .getTime() < end) return false;
+        callback.run();
+        return true;
     }
 }

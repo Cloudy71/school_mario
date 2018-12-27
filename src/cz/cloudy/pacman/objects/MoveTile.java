@@ -38,7 +38,7 @@ public class MoveTile
     }
 
     @Override
-    public void dispose() {
+    protected void dispose() {
 
     }
 

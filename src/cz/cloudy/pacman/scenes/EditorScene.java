@@ -5,15 +5,12 @@ import cz.cloudy.fxengine.interfaces.IGameScene;
 import cz.cloudy.fxengine.io.Keyboard;
 import cz.cloudy.fxengine.io.Mouse;
 import cz.cloudy.fxengine.physics.RayCaster;
-import cz.cloudy.fxengine.types.Int2;
-import cz.cloudy.fxengine.types.Tileset;
 import cz.cloudy.fxengine.types.Vector2;
 import cz.cloudy.fxengine.utils.GridUtils;
 import cz.cloudy.fxengine.utils.SerializationUtils;
 import cz.cloudy.pacman.GameMap;
 import cz.cloudy.pacman.Main;
 import cz.cloudy.pacman.objects.MoveTile;
-import cz.cloudy.pacman.objects.PacMan;
 import cz.cloudy.pacman.objects.WallTile;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
@@ -29,9 +26,7 @@ import java.util.Set;
 
 public class EditorScene
         implements IGameScene {
-    private Tileset  tileset;
     private Surface  subSurface;
-    private PacMan   pacMan;
     private Renderer renderer;
 
     private int     ghosts;
@@ -44,8 +39,6 @@ public class EditorScene
     @Override
     public void start() {
         renderer = Renderer.instance;
-
-        tileset = new Tileset(Main.class.getResourceAsStream("./tiles.png"), new Int2(16, 16));
 
         subSurface = new Surface(new Vector2(128, 128));
 

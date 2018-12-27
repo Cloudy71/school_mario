@@ -108,6 +108,7 @@ public class Renderer {
         lastFramerateCheck = 0;
         gameScenes = new LinkedList<>();
         gameScene = null;
+        time = System.nanoTime();
         this.animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -132,6 +133,19 @@ public class Renderer {
                     gameScene.fixedUpdate();
                     executingFixed = false;
                 }
+
+                boolean repeat;
+                do {
+                    repeat = false;
+                    for (Animation animation : AnimationService.animations) {
+                        if (animation.work()) {
+                            AnimationService.killAnimation(animation.id);
+                            repeat = true;
+                            break;
+                        }
+                    }
+                } while (repeat);
+
                 for (GameObject gameObject : gameObjectCollector.getGameObjects()) {
                     gameObject.update();
                     if (fixedSection) {
@@ -161,17 +175,21 @@ public class Renderer {
                 MouseController.removeReleased();
                 MouseController.removePressed();
 
-                for (Timer timer : TimerService.timers) {
-                    if (now >= timer.end) {
-                        TimerService.executeTimer(timer.id);
+                do {
+                    repeat = false;
+                    for (Timer timer : TimerService.timers) {
+                        if (timer.work()) {
+                            TimerService.killTimer(timer.id);
+                            repeat = true;
+                            break;
+                        }
                     }
-                }
+                } while (repeat);
 
                 Render.unlock();
 
                 gameScene.render();
 
-                // TODO: Object rendering.
                 for (GameObject gameObject : gameObjectCollector.getGameObjects()) {
                     gameObject.render();
                 }

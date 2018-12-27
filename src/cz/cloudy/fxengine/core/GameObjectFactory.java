@@ -18,13 +18,7 @@ public class GameObjectFactory {
                            .newInstance();
             addObject(t, true);
             return t;
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
         return null;

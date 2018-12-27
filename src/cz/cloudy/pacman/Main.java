@@ -2,6 +2,8 @@ package cz.cloudy.pacman;
 
 import cz.cloudy.fxengine.core.Renderer;
 import cz.cloudy.pacman.scenes.EditorScene;
+import cz.cloudy.pacman.scenes.GameScene;
+import cz.cloudy.pacman.scenes.MenuScene;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -29,7 +31,10 @@ public class Main
 
         renderer = Renderer.instantiate(primaryStage);
 
-        Renderer.instance.addGameScene(new EditorScene());
-        Renderer.instance.setGameScene(EditorScene.class);
+        Renderer.instance.addGameScene(MenuScene.class);
+        Renderer.instance.addGameScene(GameScene.class);
+        Renderer.instance.addGameScene(EditorScene.class);
+
+        Renderer.instance.setGameScene(MenuScene.class);
     }
 }
