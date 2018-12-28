@@ -1,6 +1,9 @@
 package cz.cloudy.fxengine.core;
 
+import cz.cloudy.fxengine.annotations.Deserialization;
+
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class GameObjectFactory {
     private static GameObjectCollector gameObjectCollector;
@@ -40,7 +43,22 @@ public class GameObjectFactory {
      */
     private static void addObject(GameObject gameObject, boolean initialCreate) {
         gameObjectCollector.addGameObject(gameObject);
-        if (initialCreate) gameObject.create();
+        if (initialCreate) {
+            gameObject.create();
+        } else {
+            Method[] methods = gameObject.getClass()
+                                         .getDeclaredMethods();
+            for (Method method : methods) {
+                if (method.getDeclaredAnnotation(Deserialization.class) != null) {
+                    try {
+                        method.setAccessible(true);
+                        method.invoke(gameObject);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     /**

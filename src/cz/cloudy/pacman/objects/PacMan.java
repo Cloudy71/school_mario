@@ -13,7 +13,6 @@ import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.physics.PhysicsDataBuilder;
 import cz.cloudy.fxengine.types.Int2;
 import cz.cloudy.fxengine.types.Pivot;
-import cz.cloudy.fxengine.types.Tileset;
 import cz.cloudy.fxengine.types.Vector2;
 import cz.cloudy.fxengine.utils.ImageUtils;
 import cz.cloudy.pacman.Main;
@@ -27,16 +26,17 @@ public class PacMan
     private int side;
     private int frame;
     private int frameSide;
+    private int score;
 
     private Image[][] sprites = new Image[4][3];
 
-    private final int SIDE_RIGHT  = 0;
-    private final int SIDE_BOTTOM = 1;
-    private final int SIDE_LEFT   = 2;
-    private final int SIDE_TOP    = 3;
+    public static final int SIDE_RIGHT  = 0;
+    public static final int SIDE_BOTTOM = 1;
+    public static final int SIDE_LEFT   = 2;
+    public static final int SIDE_TOP    = 3;
 
     private long lastFrameChange;
-    private long frameChangeInterval = 100 * 1_000_000;
+    private long frameChangeInterval = 50 * 1_000_000;
 
     @Override
     public void create() {
@@ -45,12 +45,11 @@ public class PacMan
         this.frameSide = 0;
         this.lastFrameChange = Renderer.get()
                                        .getTime();
-
-        Tileset tileset = new Tileset(Main.class.getResourceAsStream("./tiles.png"), new Int2(16, 16));
+        this.score = 0;
 
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 3; j++) {
-                sprites[i][j] = tileset.getPart(new Int2(i * 3 + j, 21));
+                sprites[i][j] = Main.tileset.getPart(new Int2(i * 3 + j, 21));
             }
         }
 
@@ -64,7 +63,7 @@ public class PacMan
             setPhysicsData(physicsData);
         } else {
             for (int i = 0; i < 3; i++) {
-                sprites[SIDE_RIGHT][i] = ImageUtils.getImagePart(tileset.getSource(), new Int2(128 + 32 * i, 256),
+                sprites[SIDE_RIGHT][i] = ImageUtils.getImagePart(Main.tileset.getSource(), new Int2(128 + 32 * i, 256),
                                                                  new Int2(32, 32));
             }
         }

@@ -7,8 +7,8 @@
 package cz.cloudy.fxengine.core;
 
 public abstract class Value {
-    protected GameObject source;
-    protected Object     value;
+    protected GameObject            source;
+    protected Object                value;
     protected KeyFrame.KeyFrameType keyFrameType;
 
     protected Value(Object value) {

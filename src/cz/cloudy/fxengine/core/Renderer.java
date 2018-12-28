@@ -185,6 +185,18 @@ public class Renderer {
                         }
                     }
                 } while (repeat);
+                do {
+                    repeat = false;
+                    for (AudioService.SoundQueueItem soundQueueItem : AudioService.playing) {
+                        if (!soundQueueItem.loop && !soundQueueItem.sound.audioClip.isPlaying()) {
+                            AudioService.playing.remove(soundQueueItem);
+                            repeat = true;
+                            break;
+                        } else if (soundQueueItem.loop && !soundQueueItem.sound.audioClip.isPlaying()) {
+                            soundQueueItem.sound.audioClip.play(soundQueueItem.volume);
+                        }
+                    }
+                } while (repeat);
 
                 Render.unlock();
 

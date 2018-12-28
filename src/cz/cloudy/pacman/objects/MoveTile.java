@@ -6,22 +6,29 @@
 
 package cz.cloudy.pacman.objects;
 
-import cz.cloudy.fxengine.core.GameObject;
-import cz.cloudy.fxengine.core.Render;
-import cz.cloudy.fxengine.core.Renderer;
+import cz.cloudy.fxengine.annotations.Deserialization;
+import cz.cloudy.fxengine.core.*;
 import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.physics.PhysicsDataBuilder;
 import cz.cloudy.fxengine.physics.RayCaster;
 import cz.cloudy.fxengine.types.Vector2;
+import cz.cloudy.pacman.Main;
 import cz.cloudy.pacman.scenes.EditorScene;
 import javafx.scene.paint.Color;
 
 public class MoveTile
         extends GameObject {
-    private int type;
+    private static final long serialVersionUID = 25L;
+    private              int  type;
 
     @Override
     public void create() {
+        deserialization();
+        this.type = 0;
+    }
+
+    @Deserialization
+    private void deserialization() {
         PhysicsData physicsData = PhysicsDataBuilder.buildRectangle(new Vector2(32f, 32f));
         physicsData.setScalable(false);
         physicsData.setSolid(false);
@@ -29,7 +36,29 @@ public class MoveTile
         physicsData.setParent(this);
         setPhysicsData(physicsData);
 
-        this.type = 0;
+        if (Renderer.get()
+                    .getGameScene() != EditorScene.class) {
+            TimerService.setTimer(Main.coinTime, () -> {
+                if (this.type == 0) {
+                    Coin coin = GameObjectFactory.createObject(Coin.class);
+                    coin.setPosition(getPosition().copy()
+                                                  .add(new Vector2(16f, 16f)));
+                    coin.setScale(Vector2.SCALE());
+                    coin.setOpacity(0f);
+                    AnimationService.beginAnimation(coin);
+                    AnimationService.addKeyFrame(500, KeyFrame.KeyFrameType.CUSTOM, new CustomValue("opacity", 1f));
+                    AnimationService.endAnimation();
+                } else if (this.type == 2) {
+                    Ghost ghost = GameObjectFactory.createObject(Ghost.class);
+                    ghost.setPosition(getPosition().copy()
+                                                   .add(new Vector2(16f, 16f)));
+                    AnimationService.beginAnimation(ghost);
+                    AnimationService.addKeyFrame(500, KeyFrame.KeyFrameType.CUSTOM, new CustomValue("scale", 1.75f));
+                    AnimationService.endAnimation();
+                }
+            });
+            Main.coinTime += 10;
+        }
     }
 
     @Override

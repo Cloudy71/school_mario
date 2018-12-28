@@ -18,7 +18,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
@@ -160,16 +159,7 @@ public class EditorScene
                 filename = file.getAbsolutePath()
                                .substring(0, file.getAbsolutePath()
                                                  .lastIndexOf("."));
-                try {
-                    FileInputStream fileInputStream = new FileInputStream(file);
-                    GameMap gameMap = SerializationUtils.deconvert(fileInputStream.readAllBytes());
-                    fileInputStream.close();
-                    gameMap.registerObjects();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
-
+                GameMap.loadMap(file);
             }
         }
     }

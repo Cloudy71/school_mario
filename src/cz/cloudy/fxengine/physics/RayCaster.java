@@ -14,8 +14,21 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class RayCaster {
+    public enum RayCastCheck {
+        ALL, SOLIDS, TRIGGERS
+    }
 
     private static final int pixelPrecision = 1;
+
+    private static RayCastCheck check = RayCastCheck.ALL;
+
+    public static void checkFor(RayCastCheck rayCastCheck) {
+        check = rayCastCheck;
+    }
+
+    private static boolean isCheckEnabled(RayCastCheck rayCastCheck) {
+        return check == rayCastCheck || check == RayCastCheck.ALL;
+    }
 
     /**
      * Checks whether line intersects any GameObject's physics data on scene.
@@ -30,8 +43,7 @@ public class RayCaster {
     public static <T> T castLine(Class<T> result, Vector2 start, Vector2 end) {
         if (result == GameObject.class) { // Single object, the nearest to start vector.
             return (T) (calculateLine(start, end, true)[0]);
-        }
-        else if (result == GameObject[].class) { // All objects in line.
+        } else if (result == GameObject[].class) { // All objects in line.
             return (T) calculateLine(start, end, false);
         }
         // TODO: Make line intersection.
@@ -54,12 +66,13 @@ public class RayCaster {
 
             for (GameObject gameObject : Renderer.instance.getGameObjectCollector()
                                                           .getGameObjects()) {
-                if (gameObject.getPhysicsData()
-                              .isHitOnly(new Vector2(x, y)) || gameObject.getPhysicsData()
-                                                                         .isTriggerOnly(new Vector2(x, y))) {
+                if (gameObject.getPhysicsData() == null) continue;
+                if ((gameObject.getPhysicsData()
+                               .isHitOnly(new Vector2(x, y)) && isCheckEnabled(RayCastCheck.SOLIDS)) ||
+                    (gameObject.getPhysicsData()
+                               .isTriggerOnly(new Vector2(x, y)) && isCheckEnabled(RayCastCheck.TRIGGERS))) {
                     if (!objects.contains(gameObject)) {
-                        if (killOnFirst)
-                            return new GameObject[]{gameObject};
+                        if (killOnFirst) return new GameObject[] {gameObject};
                         objects.add(gameObject);
                     }
                 }
@@ -67,7 +80,7 @@ public class RayCaster {
         }
 
         if (objects.size() == 0 && killOnFirst) {
-            return new GameObject[]{null};
+            return new GameObject[] {null};
         }
 
         return objects.toArray(new GameObject[0]);
@@ -76,8 +89,7 @@ public class RayCaster {
     public static <T> T castPoint(Class<T> result, Vector2 position) {
         if (result == GameObject.class) {
             return (T) (calculatePoint(position, true)[0]);
-        }
-        else if (result == GameObject[].class) {
+        } else if (result == GameObject[].class) {
             return (T) calculatePoint(position, false);
         }
 
@@ -89,12 +101,15 @@ public class RayCaster {
 
         for (GameObject gameObject : Renderer.instance.getGameObjectCollector()
                                                       .getGameObjects()) {
-            if (gameObject.getPhysicsData()
-                          .isHitOnly(position) || gameObject.getPhysicsData()
-                                                            .isTriggerOnly(position)) {
+            if (gameObject.getPhysicsData() == null) continue;
+            if ((gameObject.getPhysicsData()
+                           .isHitOnly(position) && isCheckEnabled(RayCastCheck.SOLIDS)) || (gameObject.getPhysicsData()
+                                                                                                      .isTriggerOnly(
+                                                                                                              position) &&
+                                                                                            isCheckEnabled(
+                                                                                                    RayCastCheck.TRIGGERS))) {
                 if (!objects.contains(gameObject)) {
-                    if (killOnFirst)
-                        return new GameObject[]{gameObject};
+                    if (killOnFirst) return new GameObject[] {gameObject};
 
                     objects.add(gameObject);
                 }
@@ -102,7 +117,7 @@ public class RayCaster {
         }
 
         if (objects.size() == 0 && killOnFirst) {
-            return new GameObject[]{null};
+            return new GameObject[] {null};
         }
 
         return objects.toArray(new GameObject[0]);

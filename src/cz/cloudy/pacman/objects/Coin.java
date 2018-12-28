@@ -31,6 +31,10 @@ public class Coin
     public void update() {
     }
 
+    public void setOpacity(float opacity) {
+        this.opacity = opacity;
+    }
+
     @Override
     public void render() {
         Render.begin()
@@ -38,8 +42,8 @@ public class Coin
               .setPaint(new Color(1f, 0.76f, 0.643f,
                                   opacity))
               .setPosition(getPosition().copy()
-                                        .subtract(new Vector2(8f * getScale().x, 8f * getScale().y)))
-              .setSize(new Vector2(16f * getScale().x, 16f * getScale().y))
+                                        .subtract(new Vector2(4f * getScale().x, 4f * getScale().y)))
+              .setSize(new Vector2(8f * getScale().x, 8f * getScale().y))
               .end()
               .finish();
     }
