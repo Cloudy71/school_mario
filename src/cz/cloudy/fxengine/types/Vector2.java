@@ -6,12 +6,30 @@ import java.io.Serializable;
 
 public class Vector2
         implements IMeasurable, Serializable {
+    private static final long serialVersionUID = -2946777074615714577L;
+
     public static final Vector2 ZERO() {
         return new Vector2(0f, 0f);
     }
 
     public static final Vector2 SCALE() {
         return new Vector2(1f, 1f);
+    }
+
+    public static final Vector2 UP() {
+        return new Vector2(0f, -1f);
+    }
+
+    public static final Vector2 DOWN() {
+        return new Vector2(0f, 1f);
+    }
+
+    public static final Vector2 LEFT() {
+        return new Vector2(-1f, 0f);
+    }
+
+    public static final Vector2 RIGHT() {
+        return new Vector2(1f, 0f);
     }
 
     public float x;
@@ -53,7 +71,7 @@ public class Vector2
     }
 
     public float distance(Vector2 point) {
-        return (float) Math.sqrt(1); // TODO: Finish
+        return (float) Math.sqrt((point.y - y) * (point.y - y) + (point.x - x) * (point.x - x)); // TODO: Finish
     }
 
     public Vector2 copy() {
@@ -72,7 +90,7 @@ public class Vector2
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Vector2) {
-            if (((Vector2) obj).x == x && ((Vector2) obj).y == y) return true;
+            return ((Vector2) obj).x == x && ((Vector2) obj).y == y;
         }
 
         return false;

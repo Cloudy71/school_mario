@@ -18,6 +18,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
+@Deprecated(since = "Still not implemented.")
 public @interface SceneBehaviour {
     enum BehaviourType {
         ON_START, ON_RENDER, ON_UPDATE

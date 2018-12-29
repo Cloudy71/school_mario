@@ -16,10 +16,12 @@ public class TimerService {
 
     public static int setTimer(int ms, Runnable callback) {
         timers.add(new Timer(Renderer.get()
-                                     .getTime() + (stack ? (long)stackMs * 1_000_000 : 0), Renderer.get()
-                                                                                             .getTime() +
-                                                                                     (stack ? (long)stackMs * 1_000_000 : 0) +
-                                                                                     (long) ms * 1_000_000, callback));
+                                     .getTime() + (stack ? (long) stackMs * 1_000_000 : 0), Renderer.get()
+                                                                                                    .getTime() +
+                                                                                            (stack ? (long) stackMs *
+                                                                                                     1_000_000 : 0) +
+                                                                                            (long) ms * 1_000_000,
+                             callback));
         if (stack) stackMs += ms;
         return timers.get(timers.size() - 1).id;
     }
@@ -38,6 +40,7 @@ public class TimerService {
             if (timer.id == id) {
                 timer.callback.run();
                 killTimer(timer.id);
+                return;
             }
         }
     }

@@ -2,8 +2,10 @@ package cz.cloudy.pacman;
 
 import cz.cloudy.fxengine.core.Renderer;
 import cz.cloudy.fxengine.core.Sound;
+import cz.cloudy.fxengine.physics.PathFinder;
 import cz.cloudy.fxengine.types.Int2;
 import cz.cloudy.fxengine.types.Tileset;
+import cz.cloudy.fxengine.types.Vector2;
 import cz.cloudy.pacman.scenes.EditorScene;
 import cz.cloudy.pacman.scenes.GameScene;
 import cz.cloudy.pacman.scenes.MenuScene;
@@ -17,11 +19,13 @@ public class Main
     public static Scene    scene;
     public static Renderer renderer;
 
-    public static Sound   SND_MENU;
-    public static Sound   SND_CHOMP;
-    public static int     coinTime = 0;
-    public static int     ghost    = 0;
-    public static Tileset tileset;
+    public static Sound      SND_MENU;
+    public static Sound      SND_CHOMP;
+    public static int        coinTime   = 0;
+    public static int        ghost      = 0;
+    public static GameMap    currentMap = null;
+    public static Tileset    tileset;
+    public static PathFinder pathFinder;
 
     public static void main(String[] args) {
         launch(args);
@@ -33,7 +37,7 @@ public class Main
     public void start(Stage primaryStage) {
         Group root = new Group();
         scene = new Scene(root, 800, 800);
-        primaryStage.setTitle("PacMan");
+        primaryStage.setTitle("PacMan MIL0068");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -44,6 +48,7 @@ public class Main
         tileset = new Tileset(Main.class.getResourceAsStream("./tiles.png"), new Int2(16, 16));
 
         renderer = Renderer.instantiate(primaryStage);
+        pathFinder = new PathFinder(new Vector2(32f, 32f), renderer.getSceneSize());
 
         Renderer.instance.addGameScene(MenuScene.class);
         Renderer.instance.addGameScene(GameScene.class);

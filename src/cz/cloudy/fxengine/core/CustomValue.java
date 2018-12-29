@@ -17,14 +17,17 @@ public class CustomValue
         this.field = field;
     }
 
+    private Field getField() {
+        return Reflection.findField(source.getClass(), field);
+    }
+
     @Override
     protected void setObjectValue(Object value) {
         try {
-            Field field = source.getClass()
-                                .getDeclaredField(this.field);
-            field.setAccessible(true);
+            Field field = getField();
+            if (field == null) return;
             field.set(source, value);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -32,11 +35,10 @@ public class CustomValue
     @Override
     protected Object getStartValue() {
         try {
-            Field field = source.getClass()
-                                .getDeclaredField(this.field);
-            field.setAccessible(true);
+            Field field = getField();
+            if (field == null) return null;
             return field.get(source);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;

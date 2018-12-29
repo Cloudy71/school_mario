@@ -49,12 +49,26 @@ public class MoveTile
                     AnimationService.addKeyFrame(500, KeyFrame.KeyFrameType.CUSTOM, new CustomValue("opacity", 1f));
                     AnimationService.endAnimation();
                 } else if (this.type == 2) {
-                    Ghost ghost = GameObjectFactory.createObject(Ghost.class);
+                    Ghost ghost;
+                    if (Main.ghost == 0) {
+                        ghost = GameObjectFactory.createObject(RedGhost.class);
+                    } else if (Main.ghost == 1) {
+                        ghost = GameObjectFactory.createObject(BlueGhost.class);
+                    } else if (Main.ghost == 2) {
+                        ghost = GameObjectFactory.createObject(PinkGhost.class);
+                    } else {
+                        ghost = GameObjectFactory.createObject(OrangeGhost.class);
+                    }
                     ghost.setPosition(getPosition().copy()
                                                    .add(new Vector2(16f, 16f)));
                     AnimationService.beginAnimation(ghost);
                     AnimationService.addKeyFrame(500, KeyFrame.KeyFrameType.CUSTOM, new CustomValue("scale", 1.75f));
                     AnimationService.endAnimation();
+                    Main.ghost++;
+                } else if (this.type == 1) {
+                    PacMan pacMan = GameObjectFactory.createObject(PacMan.class);
+                    pacMan.setPosition(getPosition().copy()
+                                                    .add(new Vector2(16f, 16f)));
                 }
             });
             Main.coinTime += 10;

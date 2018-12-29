@@ -17,4 +17,5 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Deprecated(since = "Still not implemented.")
 public @interface Persistent {}

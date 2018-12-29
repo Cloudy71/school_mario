@@ -4,6 +4,7 @@ import cz.cloudy.fxengine.core.GameObject;
 import cz.cloudy.fxengine.core.GameObjectFactory;
 import cz.cloudy.fxengine.core.Renderer;
 import cz.cloudy.fxengine.types.Vector2;
+import cz.cloudy.fxengine.utils.GridUtils;
 import cz.cloudy.fxengine.utils.SerializationUtils;
 import cz.cloudy.pacman.objects.MoveTile;
 import cz.cloudy.pacman.objects.WallTile;
@@ -12,17 +13,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 public class GameMap
         implements Serializable {
     private static final long serialVersionUID = 23L;
 
-    private String     name;
-    private WallTile[] wallTiles;
-    private MoveTile[] moveTiles;
+    private           String     name;
+    private           WallTile[] wallTiles;
+    private           MoveTile[] moveTiles;
+    transient private Vector2    mapSize;
+    transient private Vector2    offset;
+    transient private Vector2    startPos;
 
     public GameMap(String name, WallTile[] wallTiles, MoveTile[] moveTiles) {
         this.name = name;
@@ -52,6 +54,29 @@ public class GameMap
         }
     }
 
+    public Vector2 getTilePosition(Vector2 tile) {
+        return getTile(tile).scale(new Vector2(32f, 32f))
+                            .add(new Vector2(16f, 16f));
+    }
+
+    public Vector2 getTile(Vector2 tile) {
+        return tile.copy()
+                   .add(offset.copy()
+                              .add(startPos));
+    }
+
+    public Vector2 getMapSize() {
+        return mapSize.copy();
+    }
+
+    public Vector2 getOffset() {
+        return offset.copy();
+    }
+
+    public Vector2 getStartPos() {
+        return startPos;
+    }
+
     @SuppressWarnings("Duplicates")
     public static GameMap loadMap(File file) {
         Vector2 viewSize = new Vector2(Renderer.get()
@@ -65,11 +90,12 @@ public class GameMap
             FileInputStream fileInputStream = new FileInputStream(file);
             GameMap gameMap = SerializationUtils.deconvert(fileInputStream.readAllBytes());
             fileInputStream.close();
+            Main.currentMap = gameMap;
             Set<GameObject> objects = new LinkedHashSet<>();
             objects.addAll(Arrays.asList(gameMap.getMoveTiles()));
             objects.addAll(Arrays.asList(gameMap.getWallTiles()));
             for (GameObject moveTile : objects) {
-                Vector2 pos = getMapPos(moveTile.getPosition());
+                Vector2 pos = GridUtils.getTileByGrid(moveTile.getPosition(), new Vector2(32f, 32f));
                 if (pos.x < startPos.x) {
                     startPos.x = pos.x;
                 }
@@ -78,9 +104,9 @@ public class GameMap
                 }
             }
             for (GameObject moveTile : objects) {
-                Vector2 pos = getMapPos(moveTile.getPosition());
-                pos.x -= startPos.x + 1;
-                pos.y -= startPos.y + 1;
+                Vector2 pos = GridUtils.getTileByGrid(moveTile.getPosition(), new Vector2(32f, 32f));
+                pos.x -= startPos.x - 1;
+                pos.y -= startPos.y - 1;
                 if (pos.x > mapSize.x) {
                     mapSize.x = pos.x;
                 }
@@ -88,13 +114,32 @@ public class GameMap
                     mapSize.y = pos.y;
                 }
             }
-            offset.x = (float) Math.floor((viewSize.x - mapSize.x) / 2f) - startPos.x;
-            offset.y = (float) Math.floor((viewSize.y - mapSize.y) / 2f) - startPos.y;
+            offset.x = (float) Math.round((viewSize.x - mapSize.x) / 2f) - startPos.x;
+            offset.y = (float) Math.round((viewSize.y - mapSize.y) / 2f) - startPos.y;
+            gameMap.mapSize = mapSize;
+            gameMap.offset = offset;
+            gameMap.startPos = startPos;
             for (GameObject object : objects) {
                 object.setPosition(object.getPosition()
                                          .copy()
                                          .add(offset.copy()
                                                     .scale(new Vector2(32f, 32f))));
+            }
+            if (file.getName()
+                    .contains("main.jsb")) {
+                gameMap.name = "main";
+                Map<Vector2, Vector2[]> restrictions = new LinkedHashMap<>();
+                restrictions.put(new Vector2(9f + (startPos.x + offset.x), 7f + (startPos.y + offset.y)),
+                                 new Vector2[] {Vector2.UP()});
+                restrictions.put(new Vector2(11f + (startPos.x + offset.x), 7f + (startPos.y + offset.y)),
+                                 new Vector2[] {Vector2.UP()});
+                restrictions.put(new Vector2(9f + (startPos.x + offset.x), 17f + (startPos.y + offset.y)),
+                                 new Vector2[] {Vector2.UP()});
+                restrictions.put(new Vector2(11f + (startPos.x + offset.x), 17f + (startPos.y + offset.y)),
+                                 new Vector2[] {Vector2.UP()});
+                Main.pathFinder.addRestrictions(restrictions);
+            } else {
+                Main.pathFinder.removeRestrictions();
             }
             gameMap.registerObjects();
             return gameMap;
@@ -102,12 +147,5 @@ public class GameMap
             e.printStackTrace();
         }
         return null;
-    }
-
-    private static Vector2 getMapPos(Vector2 vec) {
-        Vector2 n = vec.copy();
-        n.x /= 32f;
-        n.y /= 32f;
-        return n;
     }
 }
