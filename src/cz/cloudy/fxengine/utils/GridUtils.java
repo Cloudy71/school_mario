@@ -17,11 +17,23 @@ public class GridUtils {
         return snapToGrid(position, grid, Vector2.ZERO());
     }
 
-    public static Vector2 getTileByGrid(Vector2 position, Vector2 grid) {
+    public static Vector2 getTileByGridDetailed(Vector2 position, Vector2 grid) {
         Vector2 pos = position.copy()
                               .scale(new Vector2(1f / grid.x, 1f / grid.y));
+        return pos;
+    }
+
+    public static Vector2 getTileByGrid(Vector2 position, Vector2 grid) {
+        Vector2 pos = getTileByGridDetailed(position, grid);
         pos.x = (float) Math.floor(pos.x);
         pos.y = (float) Math.floor(pos.y);
+        return pos;
+    }
+
+    public static Vector2 getTileByGridRound(Vector2 position, Vector2 grid) {
+        Vector2 pos = getTileByGridDetailed(position, grid);
+        pos.x = (float) Math.round(pos.x);
+        pos.y = (float) Math.round(pos.y);
         return pos;
     }
 }

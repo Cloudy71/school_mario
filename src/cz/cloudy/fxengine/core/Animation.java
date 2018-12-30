@@ -20,12 +20,14 @@ public class Animation
     protected GameObject     gameObject;
     protected long           start;
     protected List<KeyFrame> keyFrames;
+    protected int            stackMs;
 
     protected Animation() {
         this.id = ids++;
         this.start = Renderer.get()
                              .getTime();
         this.keyFrames = new LinkedList<>();
+        this.stackMs = 0;
     }
 
     @Override
@@ -41,8 +43,9 @@ public class Animation
             keyFrame.startValue = keyFrame.value.getStartValue();
             keyFrame.hasStarted = true;
         }
-        float completion = (float) (time - keyFrame.start) / (float) (keyFrame.end - keyFrame.start);
+        float completion = ((float) (time - keyFrame.start) / (float) (keyFrame.end - keyFrame.start));
         if (completion > 1f) completion = 1f;
+        else if (completion < 0f) completion = 0f;
         Object now = keyFrame.startValue;
         if (keyFrame.value.value instanceof Float) {
             Float value = (Float) keyFrame.value.value;

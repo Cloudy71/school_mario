@@ -91,8 +91,19 @@ public class MenuScene
 
     @Override
     public void update() {
-
+//        if (Mouse.isMousePressed(MouseButton.PRIMARY)) {
+//            PacMan target = Renderer.get()
+//                                    .getGameObjectCollector()
+//                                    .getGameObjectsOfType(PacMan.class)
+//                                    .iterator()
+//                                    .next();
+//            path = Main.pathFinder.computePath(GridUtils.getTileByGrid(target.getPosition(), new Vector2(32f, 32f)),
+//                                               GridUtils.getTileByGrid(Mouse.getPosition(), new Vector2(32f, 32f)))
+//                                  .moves();
+//        }
     }
+
+    private Vector2[] path = new Vector2[0];
 
     @Override
     public void render() {
@@ -114,5 +125,16 @@ public class MenuScene
               .setPosition(new Vector2(0f, 16f))
               .end()
               .finish();
+
+        Render r = Render.begin();
+        for (Vector2 vector2 : path) {
+            r.rect()
+             .setPosition(vector2.copy()
+                                 .scale(new Vector2(32f, 32f)))
+             .setSize(new Vector2(32f, 32f))
+             .setPaint(Color.PINK)
+             .end();
+        }
+        r.finish();
     }
 }

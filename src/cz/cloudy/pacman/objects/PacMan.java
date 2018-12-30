@@ -6,37 +6,62 @@
 
 package cz.cloudy.pacman.objects;
 
-import cz.cloudy.fxengine.core.GameObject;
-import cz.cloudy.fxengine.core.Renderer;
+import cz.cloudy.fxengine.core.*;
 import cz.cloudy.fxengine.io.Keyboard;
 import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.physics.PhysicsDataBuilder;
 import cz.cloudy.fxengine.types.Int2;
 import cz.cloudy.fxengine.types.Pivot;
 import cz.cloudy.fxengine.types.Vector2;
+import cz.cloudy.fxengine.utils.GridUtils;
 import cz.cloudy.fxengine.utils.ImageUtils;
 import cz.cloudy.pacman.Main;
 import cz.cloudy.pacman.scenes.GameScene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 
+import java.util.List;
+
+@SuppressWarnings("Duplicates")
 public class PacMan
         extends GameObject {
 
-    private int side;
-    private int frame;
-    private int frameSide;
-    private int score;
+    private int     side;
+    private int     frame;
+    private int     frameSide;
+    private int     score;
+    private int     plannedSide;
+    private Vector2 moveTile, oldMoveTile;
+    private List<Vector2> moveQueue;
+    private Vector2       targetTile;
+    private boolean       nextTile;
+    private int           animationId;
+    private int           timerId;
+    private int           timeToReach;
 
     private Image[][] sprites = new Image[4][3];
 
-    public static final int SIDE_RIGHT  = 0;
-    public static final int SIDE_BOTTOM = 1;
-    public static final int SIDE_LEFT   = 2;
-    public static final int SIDE_TOP    = 3;
+    public static final int SIDE_RIGHT = 0;
+    public static final int SIDE_DOWN  = 1;
+    public static final int SIDE_LEFT  = 2;
+    public static final int SIDE_UP    = 3;
 
     private long lastFrameChange;
     private long frameChangeInterval = 50 * 1_000_000;
+
+    public Vector2 getSideVector() {
+        switch (side) {
+            case SIDE_RIGHT:
+                return Vector2.RIGHT();
+            case SIDE_DOWN:
+                return Vector2.DOWN();
+            case SIDE_LEFT:
+                return Vector2.LEFT();
+            case SIDE_UP:
+                return Vector2.UP();
+        }
+        return Vector2.ZERO();
+    }
 
     @Override
     public void create() {
@@ -46,6 +71,7 @@ public class PacMan
         this.lastFrameChange = Renderer.get()
                                        .getTime();
         this.score = 0;
+        this.plannedSide = -1;
 
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 3; j++) {
@@ -83,6 +109,53 @@ public class PacMan
                 frameSide = frameSide == 0 ? 1 : 0;
             }
         }
+
+        if ((Keyboard.isKeyPress(KeyCode.A) || Keyboard.isKeyPress(KeyCode.LEFT) && side != SIDE_LEFT)) {
+            plannedSide = SIDE_LEFT;
+        }
+        if ((Keyboard.isKeyPress(KeyCode.D) || Keyboard.isKeyPress(KeyCode.RIGHT) && side != SIDE_RIGHT)) {
+            plannedSide = SIDE_RIGHT;
+        }
+        if ((Keyboard.isKeyPress(KeyCode.W) || Keyboard.isKeyPress(KeyCode.UP) && side != SIDE_UP)) {
+            plannedSide = SIDE_UP;
+        }
+        if ((Keyboard.isKeyPress(KeyCode.S) || Keyboard.isKeyPress(KeyCode.DOWN) && side != SIDE_DOWN)) {
+            plannedSide = SIDE_DOWN;
+        }
+
+        if (nextTile && moveQueue != null && moveQueue.size() > 0) {
+            Vector2 diff = moveQueue.get(0)
+                                    .copy()
+                                    .subtract(getTileByPosition().copy());
+            if (diff.x > 0f) side = PacMan.SIDE_RIGHT;
+            else if (diff.x < 0f) side = PacMan.SIDE_LEFT;
+            else if (diff.y > 0f) side = PacMan.SIDE_DOWN;
+            else if (diff.y < 0f) side = PacMan.SIDE_UP;
+
+            int time = timeToReach * (int) getTileByPosition().distance(moveQueue.get(0));
+            animationId = AnimationService.beginAnimation(this);
+            AnimationService.addKeyFrame(time, KeyFrame.KeyFrameType.MOVE, new NormalValue(moveQueue.get(0)
+                                                                                                    .copy()
+                                                                                                    .scale(new Vector2(
+                                                                                                            32f, 32f))
+                                                                                                    .add(new Vector2(
+                                                                                                            16f,
+                                                                                                            16f))));
+            AnimationService.endAnimation();
+            moveQueue.remove(0);
+            timerId = TimerService.setTimer(time, () -> nextTile = true);
+            nextTile = false;
+        }
+    }
+
+    public Vector2 getTileByPosition() {
+        return GridUtils.getTileByGrid(getPosition().copy(), new Vector2(32f, 32f));
+    }
+
+    public Vector2 getDetailedTileByPosition() {
+        return getPosition().copy()
+                            .subtract(new Vector2(16f, 16f))
+                            .scale(new Vector2(1 / 32f, 1 / 32f));
     }
 
     @Override
@@ -92,11 +165,6 @@ public class PacMan
 
     @Override
     public void fixedUpdate() {
-        if (Renderer.get()
-                    .getGameScene() != GameScene.class) return;
 
-        if (Keyboard.isKeyPress(KeyCode.UP)) {
-            this.move(new Vector2(0f, -2f));
-        }
     }
 }

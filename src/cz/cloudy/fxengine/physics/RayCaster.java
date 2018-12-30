@@ -40,6 +40,7 @@ public class RayCaster {
      * @param <T>    The result type
      * @return single object nearest to start or an array of objects which intersect.
      */
+    // TODO: Make it also for HitPoint and HitPoint[].
     public static <T> T castLine(Class<T> result, Vector2 start, Vector2 end) {
         if (result == GameObject.class) { // Single object, the nearest to start vector.
             return (T) (calculateLine(start, end, true)[0]);
@@ -87,39 +88,43 @@ public class RayCaster {
     }
 
     public static <T> T castPoint(Class<T> result, Vector2 position) {
-        if (result == GameObject.class) {
-            return (T) (calculatePoint(position, true)[0]);
-        } else if (result == GameObject[].class) {
-            return (T) calculatePoint(position, false);
-        }
-
-        return null;
+        return (T) calculatePoint(position, result);
     }
 
-    private static GameObject[] calculatePoint(Vector2 position, boolean killOnFirst) {
+    private static Object calculatePoint(Vector2 position, Class<?> result) {
         List<GameObject> objects = new LinkedList<>();
+        boolean killOnFirst = result == GameObject.class || result == HitPoint.class;
+        List<HitPoint> hitPoints = new LinkedList<>();
 
         for (GameObject gameObject : Renderer.instance.getGameObjectCollector()
                                                       .getGameObjects()) {
             if (gameObject.getPhysicsData() == null) continue;
-            if ((gameObject.getPhysicsData()
-                           .isHitOnly(position) && isCheckEnabled(RayCastCheck.SOLIDS)) || (gameObject.getPhysicsData()
-                                                                                                      .isTriggerOnly(
-                                                                                                              position) &&
-                                                                                            isCheckEnabled(
-                                                                                                    RayCastCheck.TRIGGERS))) {
+            HitPoint hitPoint;
+            if (((hitPoint = gameObject.getPhysicsData()
+                                       .isHit(position)) != null && isCheckEnabled(RayCastCheck.SOLIDS)) ||
+                ((hitPoint = gameObject.getPhysicsData()
+                                       .isTrigger(position)) != null && isCheckEnabled(RayCastCheck.TRIGGERS))) {
                 if (!objects.contains(gameObject)) {
-                    if (killOnFirst) return new GameObject[] {gameObject};
-
                     objects.add(gameObject);
+                    hitPoints.add(hitPoint);
+                    if (killOnFirst) break;
                 }
             }
         }
 
         if (objects.size() == 0 && killOnFirst) {
-            return new GameObject[] {null};
+            return null;
         }
 
-        return objects.toArray(new GameObject[0]);
+        if (result == GameObject.class) {
+            return objects.get(0);
+        } else if (result == GameObject[].class) {
+            return objects.toArray(new GameObject[0]);
+        } else if (result == HitPoint.class) {
+            return hitPoints.get(0);
+        } else if (result == HitPoint[].class) {
+            return hitPoints.toArray(new HitPoint[0]);
+        }
+        return null;
     }
 }

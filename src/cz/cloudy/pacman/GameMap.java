@@ -133,9 +133,9 @@ public class GameMap
                                  new Vector2[] {Vector2.UP()});
                 restrictions.put(new Vector2(11f + (startPos.x + offset.x), 7f + (startPos.y + offset.y)),
                                  new Vector2[] {Vector2.UP()});
-                restrictions.put(new Vector2(9f + (startPos.x + offset.x), 17f + (startPos.y + offset.y)),
+                restrictions.put(new Vector2(9f + (startPos.x + offset.x), 15f + (startPos.y + offset.y)),
                                  new Vector2[] {Vector2.UP()});
-                restrictions.put(new Vector2(11f + (startPos.x + offset.x), 17f + (startPos.y + offset.y)),
+                restrictions.put(new Vector2(11f + (startPos.x + offset.x), 15f + (startPos.y + offset.y)),
                                  new Vector2[] {Vector2.UP()});
                 Main.pathFinder.addRestrictions(restrictions);
             } else {

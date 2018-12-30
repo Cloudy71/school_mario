@@ -10,6 +10,7 @@ import cz.cloudy.fxengine.annotations.Deserialization;
 import cz.cloudy.fxengine.core.GameObject;
 import cz.cloudy.fxengine.core.Render;
 import cz.cloudy.fxengine.core.Renderer;
+import cz.cloudy.fxengine.physics.HitPoint;
 import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.physics.PhysicsDataBuilder;
 import cz.cloudy.fxengine.physics.RayCaster;
@@ -112,6 +113,52 @@ public class WallTile
     @Override
     protected void dispose() {
 
+    }
+
+    public WallTile[] findEdges() {
+        return new WallTile[] {
+                getEdge(Vector2.UP()
+                               .copy()),
+                getEdge(Vector2.LEFT()
+                               .copy()),
+                getEdge(Vector2.DOWN()
+                               .copy()),
+                getEdge(Vector2.RIGHT()
+                               .copy())
+        };
+    }
+
+    private boolean hasMoveOnSide(WallTile wall, Vector2 side) {
+        Vector2 point = wall.getPosition()
+                            .copy()
+                            .add(new Vector2(16f, 16f))
+                            .add(side.copy()
+                                     .scale(new Vector2(32f, 32f)));
+        HitPoint hitPoint = RayCaster.castPoint(HitPoint.class, point);
+        return hitPoint != null && hitPoint.isTrigger();
+    }
+
+    public boolean hasMovesOnEdges() {
+        WallTile[] edges = findEdges();
+        return hasMoveOnSide(edges[0], Vector2.UP()
+                                              .copy()) && hasMoveOnSide(edges[1], Vector2.LEFT()
+                                                                                         .copy()) &&
+               hasMoveOnSide(edges[2], Vector2.DOWN()
+                                              .copy()) && hasMoveOnSide(edges[3], Vector2.RIGHT()
+                                                                                         .copy());
+    }
+
+    private WallTile getEdge(Vector2 side) {
+        GameObject wall = RayCaster.castPoint(GameObject.class, getPosition().copy()
+                                                                             .add(new Vector2(16f, 16f))
+                                                                             .add(side.copy()
+                                                                                      .scale(new Vector2(32f, 32f))));
+        if (wall == null) return this;
+        if (wall instanceof WallTile) {
+            return ((WallTile) wall).getEdge(side);
+        } else {
+            return this;
+        }
     }
 
     @Override

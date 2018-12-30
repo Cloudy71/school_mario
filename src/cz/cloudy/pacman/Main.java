@@ -48,7 +48,8 @@ public class Main
         tileset = new Tileset(Main.class.getResourceAsStream("./tiles.png"), new Int2(16, 16));
 
         renderer = Renderer.instantiate(primaryStage);
-        pathFinder = new PathFinder(new Vector2(32f, 32f), renderer.getSceneSize());
+        pathFinder = new PathFinder(new Vector2(32f, 32f), renderer.getSceneSize(), true);
+        pathFinder.setFindPossibleEnd(true);
 
         Renderer.instance.addGameScene(MenuScene.class);
         Renderer.instance.addGameScene(GameScene.class);

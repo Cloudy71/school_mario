@@ -32,6 +32,22 @@ public class Vector2
         return new Vector2(1f, 0f);
     }
 
+    public static final Vector2 UP_LEFT() {
+        return new Vector2(-1f, -1f);
+    }
+
+    public static final Vector2 UP_RIGHT() {
+        return new Vector2(1f, -1f);
+    }
+
+    public static final Vector2 DOWN_LEFT() {
+        return new Vector2(-1f, 1f);
+    }
+
+    public static final Vector2 DOWN_RIGHT() {
+        return new Vector2(1f, 1f);
+    }
+
     public float x;
     public float y;
 
@@ -72,6 +88,25 @@ public class Vector2
 
     public float distance(Vector2 point) {
         return (float) Math.sqrt((point.y - y) * (point.y - y) + (point.x - x) * (point.x - x)); // TODO: Finish
+    }
+
+    public float angle(Vector2 point) {
+        float angle = (float) Math.toDegrees(Math.atan2(point.y - y, point.x - y));
+        if (angle < 0f) angle += 360;
+        return angle;
+    }
+
+    public Vector2 moveTowards(Vector2 point, float len) {
+        float angle = angle(point);
+        return moveTowardsByLen(angle, len);
+    }
+
+    public Vector2 moveTowardsByLen(float angle, float len) {
+        return new Vector2(x + Math.cos(Math.toRadians(angle)) * len, y + Math.sin(Math.toRadians(angle)) * len);
+    }
+
+    public float onePoint() {
+        return (float) Math.sqrt(x * y);
     }
 
     public Vector2 copy() {

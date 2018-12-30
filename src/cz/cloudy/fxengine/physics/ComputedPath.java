@@ -6,8 +6,8 @@
 
 package cz.cloudy.fxengine.physics;
 
-import cz.cloudy.fxengine.core.GameObject;
 import cz.cloudy.fxengine.types.Vector2;
+import cz.cloudy.fxengine.utils.GridUtils;
 
 import java.util.*;
 
@@ -29,12 +29,33 @@ public class ComputedPath {
         this.tried = new LinkedList<>();
     }
 
-    protected void compute() {
-        moves.clear();
-        tried.clear();
-        found = traverse(start);
+    protected void compute(Vector2[] forbiddenSides) {
+        do {
+            moves.clear();
+            tried.clear();
+            found = traverse(start, forbiddenSides);
+            if (!found && !findPossibleEnd()) break;
+        } while (!found);
     }
 
+    private boolean findPossibleEnd() {
+        if (!pathFinder.findPossibleEnd) return false;
+        // Finds points where pathfinder can find path to it and also is near the start point.
+        Vector2 absEnd = end.copy()
+                            .scale(new Vector2(32f, 32f));
+        Vector2 absStart = start.copy()
+                                .scale(new Vector2(32f, 32f));
+        if (absEnd.distance(absStart) > pathFinder.tileSize.onePoint()) {
+            absEnd = absEnd.moveTowards(absStart, pathFinder.tileSize.onePoint());
+            absEnd.x = Math.round(absEnd.x);
+            absEnd.y = Math.round(absEnd.y);
+            end = GridUtils.getTileByGridRound(absEnd, new Vector2(32f, 32f));
+            return true;
+        }
+        return false;
+    }
+
+    // TODO: Optimizer is still bad, sometimes.
     public ComputedPath optimize() {
         if (!this.found) {
             return this;
@@ -88,11 +109,11 @@ public class ComputedPath {
                                       .next() : null;
     }
 
-    private boolean traverse(Vector2 tile) {
+    private boolean traverse(Vector2 tile, Vector2[] forbiddenSides) {
         if (!isValid(tile)) return false;
 
         if (isEnd(tile)) {
-            moves.add(tile);
+//            moves.add(tile);
             return true;
         } else {
             tried.add(tile);
@@ -102,10 +123,11 @@ public class ComputedPath {
         List<Vector2> queue = new LinkedList<>();
         List<Vector2> restrictions = new LinkedList<>();
 
+        restrictions.addAll(Arrays.asList(forbiddenSides));
+
         if (pathFinder.restrictions.containsKey(tile.copy()))
             restrictions.addAll(Arrays.asList(pathFinder.restrictions.get(tile.copy())));
 
-        distances.clear();
         if (!restrictions.contains(Vector2.LEFT())) {
             distances.put(tile.copy()
                               .add(Vector2.LEFT()), end.distance(tile.copy()
@@ -127,20 +149,34 @@ public class ComputedPath {
                                                                    .add(Vector2.UP())));
         }
 
-        queue.clear();
         distances.entrySet()
                  .stream()
                  .sorted((o1, o2) -> Float.compare(o1.getValue(), o2.getValue()))
                  .forEachOrdered(vector2FloatEntry -> queue.add(vector2FloatEntry.getKey()));
 
         for (Vector2 vector2 : queue) {
-            if (traverse(vector2)) {
+            List<Vector2> newForbiddens = new LinkedList<>();
+//            if (pathFinder.fixForbiddenSidesUntilSideChange) {
+//                for (Vector2 forbiddenSide : forbiddenSides) {
+//                    if ((forbiddenSide.equals(Vector2.LEFT()) && vector2.equals(Vector2.RIGHT())) ||
+//                        (forbiddenSide.equals(Vector2.RIGHT()) && vector2.equals(Vector2.LEFT())) ||
+//                        (forbiddenSide.equals(Vector2.UP()) && vector2.equals(Vector2.DOWN())) ||
+//                        (forbiddenSide.equals(Vector2.DOWN()) && vector2.equals(Vector2.UP()))) {
+//                        newForbiddens.add(forbiddenSide);
+//                    }
+//                }
+//            }
+            if (traverse(vector2, newForbiddens.toArray(new Vector2[0]))) {
                 moves.add(0, vector2);
                 return true;
             }
         }
 
         return false;
+    }
+
+    private boolean traverse(Vector2 tile) {
+        return traverse(tile, new Vector2[0]);
     }
 
     private boolean isEnd(Vector2 tile) {
@@ -152,15 +188,12 @@ public class ComputedPath {
     }
 
     private boolean isOpen(Vector2 tile) {
-        RayCaster.checkFor(RayCaster.RayCastCheck.SOLIDS);
-        GameObject gameObject = RayCaster.castPoint(GameObject.class, tile.copy()
-                                                                          .scale(pathFinder.tileSize.copy())
-                                                                          .add(pathFinder.tileSize.copy()
-                                                                                                  .scale(new Vector2(
-                                                                                                          0.5f,
-                                                                                                          0.5f))));
-        RayCaster.checkFor(RayCaster.RayCastCheck.ALL);
-        return gameObject == null;
+        HitPoint hitPoint = RayCaster.castPoint(HitPoint.class, tile.copy()
+                                                                    .scale(pathFinder.tileSize.copy())
+                                                                    .add(pathFinder.tileSize.copy()
+                                                                                            .scale(new Vector2(0.5f,
+                                                                                                               0.5f))));
+        return (hitPoint == null && !pathFinder.triggerPathsOnly) || (hitPoint != null && hitPoint.isTrigger());
     }
 
     private boolean isTried(Vector2 tile) {

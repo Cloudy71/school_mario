@@ -40,14 +40,14 @@ public class MoveTile
                     .getGameScene() != EditorScene.class) {
             TimerService.setTimer(Main.coinTime, () -> {
                 if (this.type == 0) {
-                    Coin coin = GameObjectFactory.createObject(Coin.class);
-                    coin.setPosition(getPosition().copy()
-                                                  .add(new Vector2(16f, 16f)));
-                    coin.setScale(Vector2.SCALE());
-                    coin.setOpacity(0f);
-                    AnimationService.beginAnimation(coin);
-                    AnimationService.addKeyFrame(500, KeyFrame.KeyFrameType.CUSTOM, new CustomValue("opacity", 1f));
-                    AnimationService.endAnimation();
+//                    Coin coin = GameObjectFactory.createObject(Coin.class);
+//                    coin.setPosition(getPosition().copy()
+//                                                  .add(new Vector2(16f, 16f)));
+//                    coin.setScale(Vector2.SCALE());
+//                    coin.setOpacity(0f);
+//                    AnimationService.beginAnimation(coin);
+//                    AnimationService.addKeyFrame(500, KeyFrame.KeyFrameType.CUSTOM, new CustomValue("opacity", 1f));
+//                    AnimationService.endAnimation();
                 } else if (this.type == 2) {
                     Ghost ghost;
                     if (Main.ghost == 0) {
