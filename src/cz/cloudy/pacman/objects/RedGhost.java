@@ -17,11 +17,13 @@ public class RedGhost
         super.create();
         this.ghostId = 0;
         this.scatterTile = new Vector2(Main.currentMap.getMapSize().x - 3f, 1f);
+        this.timeToReach = 220;
         load();
     }
 
     @Override
     protected void modeChase() {
-        moveTile = GridUtils.getTileByGrid(target.getPosition(), new Vector2(32f, 32f));
+        moveTile = GridUtils.getTileByGrid(target.getPosition()
+                                                 .copy(), new Vector2(32f, 32f));
     }
 }

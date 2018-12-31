@@ -21,6 +21,7 @@ public class PathFinder {
     protected boolean                 alwaysFindNewWay;
     @Deprecated(since = "Not implemeted yet")
     protected boolean                 fixForbiddenSidesUntilSideChange;
+    protected int                     maxPossibleEndTries;
 
     public PathFinder(Vector2 tileSize, Vector2 range, boolean triggerPathsOnly) {
         this.tileSize = tileSize;
@@ -30,6 +31,7 @@ public class PathFinder {
         this.findPossibleEnd = false;
         this.alwaysFindNewWay = false;
         this.fixForbiddenSidesUntilSideChange = false;
+        this.maxPossibleEndTries = 0;
     }
 
     public PathFinder(Vector2 tileSize, Vector2 range) {
@@ -66,5 +68,9 @@ public class PathFinder {
     @Deprecated(since = "Not implemeted yet")
     public void setFixForbiddenSidesUntilSideChange(boolean fixForbiddenSidesUntilSideChange) {
         this.fixForbiddenSidesUntilSideChange = fixForbiddenSidesUntilSideChange;
+    }
+
+    public void setMaxPossibleEndTries(int maxPossibleEndTries) {
+        this.maxPossibleEndTries = maxPossibleEndTries;
     }
 }

@@ -138,8 +138,10 @@ public class GameMap
                 restrictions.put(new Vector2(11f + (startPos.x + offset.x), 15f + (startPos.y + offset.y)),
                                  new Vector2[] {Vector2.UP()});
                 Main.pathFinder.addRestrictions(restrictions);
+                Main.pathFinder1.addRestrictions(restrictions);
             } else {
                 Main.pathFinder.removeRestrictions();
+                Main.pathFinder1.removeRestrictions();
             }
             gameMap.registerObjects();
             return gameMap;

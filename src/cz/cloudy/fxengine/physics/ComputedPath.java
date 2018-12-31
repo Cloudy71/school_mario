@@ -20,6 +20,8 @@ public class ComputedPath {
     private boolean       found;
     private List<Vector2> tried;
 
+    private int tries;
+
     protected ComputedPath(Vector2 start, Vector2 end, PathFinder pathFinder) {
         this.start = start;
         this.end = end;
@@ -27,9 +29,11 @@ public class ComputedPath {
         this.moves = new LinkedList<>();
         this.found = false;
         this.tried = new LinkedList<>();
+        this.tries = 0;
     }
 
     protected void compute(Vector2[] forbiddenSides) {
+        this.tries = 0;
         do {
             moves.clear();
             tried.clear();
@@ -41,15 +45,15 @@ public class ComputedPath {
     private boolean findPossibleEnd() {
         if (!pathFinder.findPossibleEnd) return false;
         // Finds points where pathfinder can find path to it and also is near the start point.
+        if (tries >= pathFinder.maxPossibleEndTries && pathFinder.maxPossibleEndTries > 0) return false;
+        this.tries++;
         Vector2 absEnd = end.copy()
                             .scale(new Vector2(32f, 32f));
         Vector2 absStart = start.copy()
                                 .scale(new Vector2(32f, 32f));
         if (absEnd.distance(absStart) > pathFinder.tileSize.onePoint()) {
             absEnd = absEnd.moveTowards(absStart, pathFinder.tileSize.onePoint());
-            absEnd.x = Math.round(absEnd.x);
-            absEnd.y = Math.round(absEnd.y);
-            end = GridUtils.getTileByGridRound(absEnd, new Vector2(32f, 32f));
+            end = GridUtils.getTileByGridRound(absEnd.copy(), new Vector2(32f, 32f));
             return true;
         }
         return false;
@@ -113,7 +117,7 @@ public class ComputedPath {
         if (!isValid(tile)) return false;
 
         if (isEnd(tile)) {
-//            moves.add(tile);
+            moves.add(tile);
             return true;
         } else {
             tried.add(tile);

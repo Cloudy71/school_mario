@@ -18,6 +18,7 @@ public class BlueGhost
         super.create();
         this.ghostId = 1;
         this.scatterTile = new Vector2(Main.currentMap.getMapSize().x - 3f, Main.currentMap.getMapSize().y - 2f);
+        this.pathFinder = Main.pathFinder1;
         load();
     }
 
@@ -39,5 +40,9 @@ public class BlueGhost
         Vector2 desiredPos = GridUtils.getTileByGridRound(redGhost.getTileByPosition()
                                                                   .moveTowardsByLen(angle, dist), new Vector2(1f, 1f));
         moveTile = desiredPos;
+        if (!checkExistingPath()) {
+            moveTile = GridUtils.getTileByGrid(target.getPosition()
+                                                     .copy(), new Vector2(32f, 32f));
+        }
     }
 }

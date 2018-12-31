@@ -27,8 +27,8 @@ public class PinkGhost
                                                   .copy()
                                                   .scale(new Vector2(2f, 2f)));
         moveTile = playerFront;
-        if (errorFindingPath || getTileByPosition().equals(playerFront)) {
-            moveTile = GridUtils.getTileByGrid(target.getPosition(), new Vector2(32f, 32f));
+        if (!checkExistingPath() || getTileByPosition().equals(playerFront)) {
+            moveTile = GridUtils.getTileByGrid(target.getPosition().copy(), new Vector2(32f, 32f));
         }
     }
 }

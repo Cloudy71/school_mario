@@ -8,6 +8,7 @@ package cz.cloudy.pacman.objects;
 
 import cz.cloudy.fxengine.core.*;
 import cz.cloudy.fxengine.physics.ComputedPath;
+import cz.cloudy.fxengine.physics.PathFinder;
 import cz.cloudy.fxengine.physics.RayCaster;
 import cz.cloudy.fxengine.types.Int2;
 import cz.cloudy.fxengine.types.Pivot;
@@ -15,7 +16,6 @@ import cz.cloudy.fxengine.types.Vector2;
 import cz.cloudy.fxengine.utils.GridUtils;
 import cz.cloudy.pacman.Main;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -31,12 +31,13 @@ public class Ghost
     protected int ghostId;
 
     protected int       side;
-    protected Image[]   sprites = new Image[4];
+    protected Image[]   sprites = new Image[5];
+    protected Image[]   eyes    = new Image[4];
     private   float     scale;
     protected GhostMode ghostMode;
     protected Vector2   scatterTile;
     protected Vector2   moveTile, oldMoveTile;
-    private   List<Vector2> moveQueue;
+    protected List<Vector2> moveQueue;
     private   Vector2       targetTile;
     private   boolean       nextTile;
     protected PacMan        target;
@@ -46,6 +47,9 @@ public class Ghost
     private   int           animationId;
     private   int           timerId;
     protected boolean       errorFindingPath;
+    protected PathFinder    pathFinder;
+    protected boolean       dead;
+    private   int           deadTimer;
 
     @Override
     public void create() {
@@ -59,6 +63,9 @@ public class Ghost
         this.errorFindingPath = false;
         this.animationId = -1;
         this.timerId = -1;
+        this.pathFinder = Main.pathFinder;
+        this.dead = false;
+        this.deadTimer = -1;
 
         if (Main.currentMap.getName()
                            .equals("main")) {
@@ -104,7 +111,9 @@ public class Ghost
     protected void load() {
         for (int i = 0; i < 4; i++) {
             sprites[i] = Main.tileset.getPart(new Int2(i * 2, 16 + ghostId));
+            eyes[i] = Main.tileset.getPart(new Int2(i, 20));
         }
+        sprites[PacMan.SIDE_FRIGHTENED] = Main.tileset.getPart(new Int2(10, 19));
 
         this.scale = 0f;
 
@@ -119,7 +128,7 @@ public class Ghost
     }
 
     protected void modeFrightened() {
-
+        modeScatter();
     }
 
     protected void modeChase() {
@@ -134,19 +143,35 @@ public class Ghost
         } else if (ghostMode == GhostMode.CHASE && target != null) {
             modeChase();
         } else if (ghostMode == GhostMode.WAIT) {
-            changeMode(GhostMode.CHASE);
+            changeMode(GhostMode.SCATTER);
         }
     }
 
-    protected void changeMode(GhostMode mode) {
+    private void pacManTouch() {
+        if (target == null) return;
+        Vector2 pos = GridUtils.getTileByGridRound(getPosition().copy(), new Vector2(32f, 32f));
+        Vector2 pPos = GridUtils.getTileByGridRound(target.getPosition()
+                                                          .copy(), new Vector2(32f, 32f));
+        if (pos.equals(pPos)) {
+            if (ghostMode == GhostMode.CHASE || ghostMode == GhostMode.SCATTER) target.kill();
+            else {
+                dead = true;
+                deadTimer = TimerService.setTimer(5000, () -> {
+                    dead = false;
+                });
+            }
+        }
+    }
+
+    public void changeMode(GhostMode mode) {
         // Find nearest think point (just to change ghost's direction)
         Vector2 nearest = null;
         int dist = Integer.MAX_VALUE;
         if (thinkPoints.length > 0) {
             for (Vector2 thinkPoint : thinkPoints) {
-                int moves = Main.pathFinder.computePath(getTileByPosition(), Main.currentMap.getTile(thinkPoint))
-                                           .optimize()
-                                           .moves().length;
+                int moves = pathFinder.computePath(getTileByPosition(), Main.currentMap.getTile(thinkPoint))
+                                      .optimize()
+                                      .moves().length;
                 if (moves < dist) {
                     dist = moves;
                     nearest = thinkPoint;
@@ -217,30 +242,50 @@ public class Ghost
                 pos = begin.copy();
             }
 
-            Vector2[] moves = Main.pathFinder.computePath(start, pos)
-                                             .moves();
+            Vector2[] moves = pathFinder.computePath(start, pos)
+                                        .moves();
             if (moves.length > 0) {
                 start = moves[moves.length - 1];
             }
             moveQueue.addAll(Arrays.asList(moves));
         }
         moveQueue.add(begin);
-        for (Vector2 vector2 : moveQueue) {
-            Coin coin = GameObjectFactory.createObject(Coin.class);
-            coin.setOpacity(1f);
-            coin.setPosition(vector2.copy()
-                                    .scale(new Vector2(32f, 32f))
-                                    .add(new Vector2(16f, 16f)));
-        }
+    }
+
+    protected boolean checkExistingPath() {
+        ComputedPath computedPath = pathFinder.computePath(getTileByPosition(), moveTile);
+        return computedPath.isFound();
     }
 
     @Override
     public void update() {
-
-        setSprite(sprites[side]);
+        if (ghostMode == GhostMode.FRIGHTENED && !dead) side = PacMan.SIDE_FRIGHTENED;
+        if (dead) {
+            if (side >= 4) side = 0;
+            setSprite(eyes[side]);
+            Vector2 point = null;
+            for (MoveTile tile : Renderer.get()
+                                         .getGameObjectCollector()
+                                         .getGameObjectsOfType(MoveTile.class)) {
+                if (tile.getType() == 2) {
+                    point = GridUtils.getTileByGrid(tile.getPosition()
+                                                        .copy()
+                                                        .subtract(new Vector2(16f, 16f)), new Vector2(32f, 32f));
+                    if (getTileByPosition().equals(point)) {
+                        dead = false;
+                        ghostMode = GhostMode.CHASE;
+                        TimerService.killTimer(deadTimer);
+                    }
+                }
+            }
+            if (dead) {
+                moveTile = point;
+            }
+        } else {
+            setSprite(sprites[side]);
+        }
         setScale(new Vector2(scale, scale));
-//        if (ghostId != 0) return;
-//        if (true) return;
+        pacManTouch();
         if (target == null && Renderer.get()
                                       .getGameObjectCollector()
                                       .getGameObjectsOfType(PacMan.class)
@@ -262,20 +307,19 @@ public class Ghost
                 }
             }
         }
-        if ((moveQueue.size() == 0 && getDetailedTileByPosition().equals(moveTile)) || thinkPoints.length == 0) {
+        if ((moveQueue.size() == 0) || thinkPoints.length == 0) {
             think();
         }
 
         if (!moveTile.equals(oldMoveTile)) {
             moveQueue.clear();
-            ComputedPath computedPath = Main.pathFinder.computePath(getTileByPosition(), moveTile)
-                                                       .optimize();
+            ComputedPath computedPath = pathFinder.computePath(getTileByPosition(), moveTile);
             errorFindingPath = !computedPath.isFound();
             moveQueue.addAll(Arrays.asList(computedPath.moves()));
             nextTile = true;
             AnimationService.killAnimation(animationId);
             TimerService.executeTimer(timerId);
-            if (errorFindingPath && ghostMode == GhostMode.CHASE) {
+            if ((errorFindingPath || moveQueue.size() == 0) && ghostMode == GhostMode.CHASE) {
                 lastThinkPoint = Vector2.ZERO();
             }
         }
@@ -324,18 +368,18 @@ public class Ghost
 
     @Override
     public void render() {
-        Color c = Color.RED;
-        if (ghostId == 1) c = Color.BLUE;
-        else if (ghostId == 2) c = Color.PINK;
-        else if (ghostId == 3) c = Color.ORANGE;
-        Render r = Render.begin();
-        r.rect()
-         .setPosition(moveTile.copy()
-                              .scale(new Vector2(32f, 32f)))
-         .setSize(new Vector2(32f, 32f))
-         .setPaint(c)
-         .end();
-        r.finish();
+//        Color c = Color.RED;
+//        if (ghostId == 1) c = Color.BLUE;
+//        else if (ghostId == 2) c = Color.PINK;
+//        else if (ghostId == 3) c = Color.ORANGE;
+//        Render r = Render.begin();
+//        r.rect()
+//         .setPosition(moveTile.copy()
+//                              .scale(new Vector2(32f, 32f)))
+//         .setSize(new Vector2(32f, 32f))
+//         .setPaint(c)
+//         .end();
+//        r.finish();
         super.render();
     }
 }

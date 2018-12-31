@@ -35,7 +35,7 @@ public class MenuScene
 
         Coin[] coins = new Coin[num];
 
-        AudioService.setVolume(0.25);
+        AudioService.setVolume(0.1);
         Main.SND_MENU.play();
 
         Main.coinTime = 0;

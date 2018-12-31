@@ -8,8 +8,10 @@ package cz.cloudy.pacman.objects;
 
 import cz.cloudy.fxengine.core.*;
 import cz.cloudy.fxengine.io.Keyboard;
+import cz.cloudy.fxengine.physics.HitPoint;
 import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.physics.PhysicsDataBuilder;
+import cz.cloudy.fxengine.physics.RayCaster;
 import cz.cloudy.fxengine.types.Int2;
 import cz.cloudy.fxengine.types.Pivot;
 import cz.cloudy.fxengine.types.Vector2;
@@ -20,6 +22,7 @@ import cz.cloudy.pacman.scenes.GameScene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @SuppressWarnings("Duplicates")
@@ -38,13 +41,15 @@ public class PacMan
     private int           animationId;
     private int           timerId;
     private int           timeToReach;
+    private boolean       dead;
 
     private Image[][] sprites = new Image[4][3];
 
-    public static final int SIDE_RIGHT = 0;
-    public static final int SIDE_DOWN  = 1;
-    public static final int SIDE_LEFT  = 2;
-    public static final int SIDE_UP    = 3;
+    public static final int SIDE_RIGHT      = 0;
+    public static final int SIDE_DOWN       = 1;
+    public static final int SIDE_LEFT       = 2;
+    public static final int SIDE_UP         = 3;
+    public static final int SIDE_FRIGHTENED = 4;
 
     private long lastFrameChange;
     private long frameChangeInterval = 50 * 1_000_000;
@@ -72,6 +77,14 @@ public class PacMan
                                        .getTime();
         this.score = 0;
         this.plannedSide = -1;
+        this.moveTile = Vector2.ZERO();
+        this.animationId = -1;
+        this.timerId = -1;
+        this.timeToReach = 250;
+        this.nextTile = true;
+        this.dead = false;
+
+        this.moveQueue = new LinkedList<>();
 
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 3; j++) {
@@ -94,6 +107,39 @@ public class PacMan
             }
         }
         setPivot(Pivot.CENTER());
+    }
+
+    private void checkForCoin() {
+        GameObject[] gameObjects = RayCaster.castPoint(GameObject[].class, getPosition().copy());
+        for (GameObject gameObject : gameObjects) {
+            if (gameObject instanceof Coin) {
+                if (((Coin) gameObject).getType() == 1) {
+                    for (Ghost ghost : Renderer.get()
+                                               .getGameObjectCollector()
+                                               .getGameObjectsOfType(Ghost.class)) {
+                        ghost.changeMode(Ghost.GhostMode.FRIGHTENED);
+                    }
+                }
+                this.score += 10;
+                gameObject.destroy();
+            }
+        }
+
+        int count = Renderer.get()
+                            .getGameObjectCollector()
+                            .getGameObjectsOfType(Coin.class)
+                            .size();
+        if (count == 0) {
+            killGhosts();
+        }
+    }
+
+    private void killGhosts() {
+        for (Ghost ghost : Renderer.get()
+                                   .getGameObjectCollector()
+                                   .getGameObjectsOfType(Ghost.class)) {
+            ghost.destroy();
+        }
     }
 
     @Override
@@ -123,6 +169,24 @@ public class PacMan
             plannedSide = SIDE_DOWN;
         }
 
+        if (plannedSide != -1 && moveQueue.size() == 0) {
+            side = plannedSide;
+            plannedSide = -1;
+        }
+
+        if (moveQueue.size() == 0 && nextTile) {
+            checkForCoin();
+            Vector2 point = getTileByPosition().copy()
+                                               .add(getSideVector())
+                                               .scale(new Vector2(32f, 32f))
+                                               .add(new Vector2(16f, 16f));
+            HitPoint hitPoint = RayCaster.castPoint(HitPoint.class, point);
+            if (hitPoint != null && hitPoint.isTrigger()) {
+                moveQueue.add(point.subtract(new Vector2(16f, 16f))
+                                   .scale(new Vector2(1f / 32f, 1f / 32f)));
+            }
+        }
+
         if (nextTile && moveQueue != null && moveQueue.size() > 0) {
             Vector2 diff = moveQueue.get(0)
                                     .copy()
@@ -146,6 +210,8 @@ public class PacMan
             timerId = TimerService.setTimer(time, () -> nextTile = true);
             nextTile = false;
         }
+
+        oldMoveTile = moveTile.copy();
     }
 
     public Vector2 getTileByPosition() {
@@ -158,6 +224,14 @@ public class PacMan
                             .scale(new Vector2(1 / 32f, 1 / 32f));
     }
 
+    private void setGhostsMode(Ghost.GhostMode ghostsMode) {
+        for (Ghost ghost : Renderer.get()
+                                   .getGameObjectCollector()
+                                   .getGameObjectsOfType(Ghost.class)) {
+            ghost.changeMode(ghostsMode);
+        }
+    }
+
     @Override
     protected void dispose() {
 
@@ -166,5 +240,10 @@ public class PacMan
     @Override
     public void fixedUpdate() {
 
+    }
+
+    public void kill() {
+        dead = true;
+        killGhosts();
     }
 }

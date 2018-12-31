@@ -25,7 +25,7 @@ public class Main
     public static int        ghost      = 0;
     public static GameMap    currentMap = null;
     public static Tileset    tileset;
-    public static PathFinder pathFinder;
+    public static PathFinder pathFinder, pathFinder1;
 
     public static void main(String[] args) {
         launch(args);
@@ -49,7 +49,9 @@ public class Main
 
         renderer = Renderer.instantiate(primaryStage);
         pathFinder = new PathFinder(new Vector2(32f, 32f), renderer.getSceneSize(), true);
-        pathFinder.setFindPossibleEnd(true);
+        pathFinder1 = new PathFinder(new Vector2(32f, 32f), renderer.getSceneSize(), true);
+        pathFinder1.setFindPossibleEnd(true);
+        pathFinder1.setMaxPossibleEndTries(5);
 
         Renderer.instance.addGameScene(MenuScene.class);
         Renderer.instance.addGameScene(GameScene.class);

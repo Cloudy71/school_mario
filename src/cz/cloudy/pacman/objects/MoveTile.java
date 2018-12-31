@@ -12,6 +12,7 @@ import cz.cloudy.fxengine.physics.PhysicsData;
 import cz.cloudy.fxengine.physics.PhysicsDataBuilder;
 import cz.cloudy.fxengine.physics.RayCaster;
 import cz.cloudy.fxengine.types.Vector2;
+import cz.cloudy.fxengine.utils.GridUtils;
 import cz.cloudy.pacman.Main;
 import cz.cloudy.pacman.scenes.EditorScene;
 import javafx.scene.paint.Color;
@@ -40,14 +41,30 @@ public class MoveTile
                     .getGameScene() != EditorScene.class) {
             TimerService.setTimer(Main.coinTime, () -> {
                 if (this.type == 0) {
-//                    Coin coin = GameObjectFactory.createObject(Coin.class);
-//                    coin.setPosition(getPosition().copy()
-//                                                  .add(new Vector2(16f, 16f)));
-//                    coin.setScale(Vector2.SCALE());
-//                    coin.setOpacity(0f);
-//                    AnimationService.beginAnimation(coin);
-//                    AnimationService.addKeyFrame(500, KeyFrame.KeyFrameType.CUSTOM, new CustomValue("opacity", 1f));
-//                    AnimationService.endAnimation();
+                    Coin coin = GameObjectFactory.createObject(Coin.class);
+                    coin.setPosition(getPosition().copy()
+                                                  .add(new Vector2(16f, 16f)));
+                    coin.setScale(Vector2.SCALE());
+                    coin.setOpacity(0f);
+                    if (Main.currentMap.getName()
+                                       .equals("main")) {
+                        Vector2[] bigCoins = new Vector2[] {
+                                new Vector2(2f, 2f),
+                                new Vector2(2f, 15f),
+                                new Vector2(18f, 2f),
+                                new Vector2(18f, 15f)
+                        };
+                        for (Vector2 bigCoin : bigCoins) {
+                            if (GridUtils.getTileByGrid(getPosition().copy(), new Vector2(32f, 32f))
+                                               .equals(Main.currentMap.getTile(bigCoin.copy()))) {
+                                coin.setType(1);
+                            }
+                        }
+
+                    }
+                    AnimationService.beginAnimation(coin);
+                    AnimationService.addKeyFrame(500, KeyFrame.KeyFrameType.CUSTOM, new CustomValue("opacity", 1f));
+                    AnimationService.endAnimation();
                 } else if (this.type == 2) {
                     Ghost ghost;
                     if (Main.ghost == 0) {

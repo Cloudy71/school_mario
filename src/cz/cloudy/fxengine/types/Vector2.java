@@ -91,7 +91,7 @@ public class Vector2
     }
 
     public float angle(Vector2 point) {
-        float angle = (float) Math.toDegrees(Math.atan2(point.y - y, point.x - y));
+        float angle = (float) Math.toDegrees(Math.atan2(point.y - y, point.x - x));
         if (angle < 0f) angle += 360;
         return angle;
     }

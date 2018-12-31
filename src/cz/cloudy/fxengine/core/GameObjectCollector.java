@@ -49,8 +49,7 @@ public class GameObjectCollector {
     public <T extends GameObject> Set<T> getGameObjectsOfType(Class<T> type) {
         List<T> objects = new LinkedList<>();
         for (GameObject gameObject : getGameObjects()) {
-            if (gameObject.getClass()
-                          .equals(type)) {
+            if (type.isAssignableFrom(gameObject.getClass())) {
                 objects.add((T) gameObject);
             }
         }
